@@ -972,7 +972,7 @@ function COE_Totem:OnTotemButtonLoad()
 	this:RegisterEvent( "UNIT_INVENTORY_CHANGED" );
 	this:RegisterEvent( "BAG_UPDATE" );
 	this:RegisterEvent( "UPDATE_BINDINGS" );
-	this:RegisterEvent( "SPELLCAST_STOP" );
+	this:RegisterEvent( "COMBAT_TEXT_UPDATE" );
 
 end
 
@@ -1004,42 +1004,47 @@ function COE_Totem:OnTotemButtonEvent( event )
 			COE_Totem:UpdateTotemButtonIsUsable();
 		end
 		
-	elseif( event == "UNIT_INVENTORY_CHANGED" or event == "BAG_UPDATE" ) then
-		-- check for presence of totem tools
-		-- ----------------------------------
-		local totem = this.totem;
-		if( totem and totem ~= COE.NoTotem ) then
+	elseif((event == "UNIT_INVENTORY_CHANGED" and arg1 == "player") or event == "BAG_UPDATE" ) then
+		local function CheckTools()
+			-- check for presence of totem tools
+			-- ----------------------------------
+			local totem = this.totem;
+			if( totem and totem ~= COE.NoTotem ) then
 
-			if( totem.isTrinket ) then
-				local slot;
-				totem.ToolPresent, slot = COE:IsTrinketPresent();
-				
-				if( slot and slot ~= totem.TrinketSlot and totem.CurCooldown < 30 ) then
-					-- trinket has been (re-)equipped
-					-- start item cooldown
-					-- -------------------------------
-					totem.CurCooldown = 30;
-					Chronos.startTimer( "COECooldown" .. totem.SpellName );	
-					Chronos.scheduleByName( "COECooldownSwitch" .. totem.SpellName, totem.CurCooldown, COESched_CooldownEnd, totem );	
+				if( totem.isTrinket ) then
+					local slot;
+					totem.ToolPresent, slot = COE:IsTrinketPresent();
 					
+					if( slot and slot ~= totem.TrinketSlot and totem.CurCooldown < 30 ) then
+						-- trinket has been (re-)equipped
+						-- start item cooldown
+						-- -------------------------------
+						totem.CurCooldown = 30;
+						Chronos.startTimer( "COECooldown" .. totem.SpellName );	
+						Chronos.scheduleByName( "COECooldownSwitch" .. totem.SpellName, totem.CurCooldown, COESched_CooldownEnd, totem );	
+						
+					end
+					
+					totem.TrinketSlot = slot;				
+				else
+					totem.ToolPresent = COE:IsToolPresent( totem.Ranks[1].SpellID );
 				end
-				
-				totem.TrinketSlot = slot;				
-			else
-				totem.ToolPresent = COE:IsToolPresent( totem.Ranks[1].SpellID );
 			end
 		end
+		-- Reduce check frequencies
+		if Chronos.isScheduledByName( "COEToolCheck" ) then return end
+		Chronos.scheduleByName( "COEToolCheck", 1, CheckTools )
 		
 	elseif( event == "UPDATE_BINDINGS" ) then
 		if( this.totem ) then
 			COE_Totem:UpdateTotemButtonHotKey();
 		end
 
-	elseif( event == "SPELLCAST_STOP" ) then
+	elseif( event == "COMBAT_TEXT_UPDATE" and arg1 == "SPELL_CAST" ) then
 		-- activate timer if totem is pending
 		-- -----------------------------------
 		if( COE_Config:GetSaved( COEOPT_ENABLETIMERS ) == 1 and 
-			this.totem and this.totem == COE.TotemPending.Totem ) then
+			this.totem and COE.TotemPendings[this.totem] and this.totem == COE.TotemPendings[this.totem].Totem ) then
 				COE_Totem:ActivatePendingTotem( this.totem );
 		end
 			

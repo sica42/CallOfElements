@@ -166,6 +166,8 @@ end
 -------------------------------------------------------------------]]
 function COEProcessShellCommand( msg )
 
+	local _,_,msg,arg = string.find(msg,"(%S*)%s?(.*)")
+
 	if( msg == "" or msg == "config" ) then
 		COE:ToggleConfigFrame();
 		
@@ -179,7 +181,7 @@ function COEProcessShellCommand( msg )
 		COE_Totem:SwitchToPriorSet();
 
 	elseif( msg == "throwset" ) then
-		COE_Totem:ThrowSet();
+		COE_Totem:ThrowSet(arg);
 		
 	elseif( msg == "restartset" ) then
 		COE_Totem:ResetSetCycle();
@@ -206,8 +208,7 @@ function COEProcessShellCommand( msg )
 	elseif( msg == "battleheal" ) then
 		COE_Heal:BattleHeal();
 
-	else
-		local _,_,arg = string.find( msg, "set (.*)" );
+	elseif (msg == "set") then
 		if( arg ) then
 			COE_Totem:SwitchToSet( arg );
 		end

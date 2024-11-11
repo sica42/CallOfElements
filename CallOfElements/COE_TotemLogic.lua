@@ -488,13 +488,12 @@ function COE_Totem:SwitchToPriorSet()
 	
 end
 
-
 --[[ ----------------------------------------------------------------
 	METHOD: COE_Totem:SwitchToSet
 	
 	PURPOSE: Activates the specified totem set
 -------------------------------------------------------------------]]
-function COE_Totem:SwitchToSet( name )
+function COE_Totem:GetSetIndex( name )
 
 	if( COE_Config:GetSaved( COEOPT_ENABLESETS ) == 0 ) then
 		return;
@@ -531,6 +530,22 @@ function COE_Totem:SwitchToSet( name )
 	if( not set ) then
 		return;
 	end
+	return set,pvpset
+
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COE_Totem:SwitchToSet
+	
+	PURPOSE: Activates the specified totem set
+-------------------------------------------------------------------]]
+function COE_Totem:SwitchToSet( name )
+
+	local set,pvpset = COE_Totem:GetSetIndex( name )
+
+	if( not set ) then
+		return;
+	end
 
 	-- activate set if not already active
 	-- chech this to stop notification spamming in a duel
@@ -560,22 +575,29 @@ end
 	PURPOSE: Throws the next totem in the active set that is not
 		yet thrown
 -------------------------------------------------------------------]]
-function COE_Totem:ThrowSet()
+function COE_Totem:ThrowSet(set)
 
 	if( COE_Config:GetSaved( COEOPT_ENABLESETS ) == 1 ) then
-	
+
 		-- =======================================================================			
 		-- check which totem to throw
 		-- =======================================================================			
 		local activeset = COE_Config:GetSaved( COEOPT_ACTIVESET );
+		local source = COE.TotemSets
+
+		local setfound = false
+		if set then
+			activeset = COE_Totem:GetSetIndex( set )
+			if not activeset then return end -- none found, but custom was specified, exit function
+		end
 
 		local k;
 		for k = 1,4 do
-		
 			local element = COE:LocalizedElement( COE.TotemSets[activeset].CastOrder[k] );
 			local totem = COE.TotemSets[activeset][element]; 
-		
-			if( COE.SetCycle[element] == false and totem  ) then
+			local active = COE.ActiveTotems[element]
+
+			if( totem and active ~= totem or (active and not active.isActive ) ) then
 				
 				if( totem.isTrinket ) then
 				
@@ -597,7 +619,9 @@ function COE_Totem:ThrowSet()
 					
 					if( start == 0 and duration == 0 ) then
 						CastSpellByName( COE.TotemSets[activeset][element].SpellName );
-						return;
+						if not QueueSpellByName then -- if not peponam can't cast more
+							return
+						end
 					end
 				end
 			end
@@ -614,7 +638,7 @@ end
 function COE_Totem:ResetSetCycle()
 
 	COE:Message( COESTR_RESTARTINGSET );
-	COE.SetCycle = { Earth = false, Fire = false, Water = false, Air = false };
+	COE.SetCycle = { Earth = nil, Fire = nil, Water = nil, Air = nil };
 
 end
 
@@ -636,22 +660,21 @@ function COE_Totem:SetPendingTotem( totem, rank )
 
 	if( totem ) then
 		COE:DebugMessage( "Setting pending totem: " .. totem.SpellName .. " with rank: " .. rank );
-		COE.TotemPending.Totem = totem;
-		COE.TotemPending.UseRank = rank;
 		
 		-- get the current lag
 		-- --------------------
 		local _,_,lag = GetNetStats();
 		local timeout = lag / 1000 + COE.TotemPending.Timeout;
 		
+		COE.TotemPendings[totem] = { Totem = totem, UseRank = rank, Timeout = timeout }
 		-- use lag + 0.5 seconds as pending timeout
 		-- -----------------------------------------
 		COE:DebugMessage( "Setting pending timeout to: " .. timeout .. " msec" ); 
 		
-		Chronos.scheduleByName( "COE_Pending", timeout, COESched_CheckPendingTotem );
-	else
-		COE.TotemPending.Totem = nil;
-		COE.TotemPending.UseRank = 0; 
+		Chronos.scheduleByName( "COE_Pending", timeout, COESched_CheckPendingTotems );
+	-- else
+	-- 	COE.TotemPending.Totem = nil;
+	-- 	COE.TotemPending.UseRank = 0; 
 	end
 
 end
@@ -673,6 +696,15 @@ function COESched_CheckPendingTotem()
 	
 end
 
+function COESched_CheckPendingTotems()
+	
+	-- if there is still a pending totem it has timed out
+	-- ---------------------------------------------------
+	for totem in COE.TotemPendings do
+		COE:DebugMessage( "Pending totem has timed out: " .. COE.TotemPendings[totem].Totem.SpellName );
+		COE.TotemPendings[totem] = nil
+	end
+end
 
 --[[ ----------------------------------------------------------------
 	METHOD: COE_Totem:ActivatePendingTotem
@@ -684,7 +716,7 @@ function COE_Totem:ActivatePendingTotem( totem )
 	
 	-- deactivate still active totem of the same element
 	-- --------------------------------------------------
-	local active = COE.ActiveTotems[COE.TotemPending.Totem.Element]; 
+	local active = COE.ActiveTotems[COE.TotemPendings[totem].Totem.Element]; 
 	if( active ) then
 		COE_Totem:DeactivateTimer( active );
 	end
@@ -692,13 +724,13 @@ function COE_Totem:ActivatePendingTotem( totem )
 	-- activate timer
 	-- ---------------
 	Chronos.startTimer( "COE" .. totem.SpellName );
-	totem.CurDuration = COE.TotemPending.Totem.Ranks[COE.TotemPending.UseRank].Duration;
-	totem.CurHealth = COE.TotemPending.Totem.Ranks[COE.TotemPending.UseRank].Health;
+	totem.CurDuration = COE.TotemPendings[totem].Totem.Ranks[COE.TotemPendings[totem].UseRank].Duration;
+	totem.CurHealth = COE.TotemPendings[totem].Totem.Ranks[COE.TotemPendings[totem].UseRank].Health;
 
 	-- activate cooldown timer if this totem has a cooldown
 	-- -----------------------------------------------------
-	if( COE.TotemPending.Totem.Ranks[COE.TotemPending.UseRank].Cooldown > 0 ) then
-		totem.CurCooldown = COE.TotemPending.Totem.Ranks[COE.TotemPending.UseRank].Cooldown;
+	if( COE.TotemPendings[totem].Totem.Ranks[COE.TotemPendings[totem].UseRank].Cooldown > 0 ) then
+		totem.CurCooldown = COE.TotemPendings[totem].Totem.Ranks[COE.TotemPendings[totem].UseRank].Cooldown;
 		Chronos.startTimer( "COECooldown" .. totem.SpellName );	
 		Chronos.scheduleByName( "COECooldownSwitch" .. totem.SpellName, totem.CurCooldown, COESched_CooldownEnd, totem );	
 	end
@@ -713,13 +745,13 @@ function COE_Totem:ActivatePendingTotem( totem )
 
 	-- mark totem as active
 	-- ---------------------
-	COE.ActiveTotems[COE.TotemPending.Totem.Element] = totem;
+	COE.ActiveTotems[COE.TotemPendings[totem].Totem.Element] = totem;
 	totem.isActive = true;
 	
 	-- set totem in timer frame
 	-- -------------------------
 	if( COE_Config:GetSaved( COEOPT_TIMERFRAME ) == 1 ) then
-		getglobal( "COETimer" .. COE.TotemPending.Totem.Element ).totem = totem;
+		getglobal( "COETimer" .. COE.TotemPendings[totem].Totem.Element ).totem = totem;
 		COETimerFrame:Show();
 	end 
 	
@@ -731,12 +763,13 @@ function COE_Totem:ActivatePendingTotem( totem )
 		COE.TotemSets[activeset][totem.Element].SpellName == totem.SpellName ) then
 		
 		COE:DebugMessage( "Element " .. totem.Element .. " in current cycle: SET" );
-		COE.SetCycle[totem.Element] = true;
+		COE.SetCycle[totem.Element] = totem.SpellName ;
 	end
 
 	-- clear pending totem
 	-- --------------------
-	COE_Totem:SetPendingTotem( nil );
+	-- COE_Totem:SetPendingTotem( nil );
+	COE.TotemPendings[totem] = nil
 	
 	-- if in timers only mode, reconfigure the totem bar
 	-- --------------------------------------------------
@@ -790,7 +823,7 @@ function COE_Totem:DeactivateTimer( totem )
 			COE.TotemSets[activeset][totem.Element].SpellName == totem.SpellName ) then
 		
 			COE:DebugMessage( "Element " .. totem.Element .. " in current cycle: UNSET" );
-			COE.SetCycle[totem.Element] = false;
+			COE.SetCycle[totem.Element] = nil;
 		end
 		
 		-- invalidate dynamic buttons
@@ -994,9 +1027,9 @@ function COE_Totem:SetupTimerHooks()
 	end;
 
 	COE_Totem.TimerHooks["CastSpellByName"] = CastSpellByName;
-	CastSpellByName = function( SpellName, onSelf)
+	CastSpellByName = function( SpellName,onself )
 		COE_Totem:HookCastSpellByName( SpellName );
-		COE_Totem.TimerHooks["CastSpellByName"]( SpellName, onSelf );
+		COE_Totem.TimerHooks["CastSpellByName"]( SpellName,onself );
 	end;
 
 	COE_Totem.TimerHooks["UseInventoryItem"] = UseInventoryItem;
@@ -1141,14 +1174,14 @@ function COE_Totem:HookCastSpellByName( SpellName )
 	if( COE_Config:GetSaved( COEOPT_ENABLETIMERS ) == 0 ) then
 		return;
 	end
-	
+
 	-- extract rank information
 	-- -------------------------
 	local _,_,rank = string.find( SpellName, COESTR_CASTBYNAME );
 	local spell = string.gsub( SpellName, COESTR_CASTBYNAME, "" );
-	
+
 	-- Check for Totemic Recall
-	if not isTotemicRecall(text) then
+	if not isTotemicRecall( spell ) then
 		-- get the associated totem object
 		-- --------------------------------
 		local i, k, totem;
@@ -1159,7 +1192,8 @@ function COE_Totem:HookCastSpellByName( SpellName )
 				else
 					rank = COE.TotemData[i].MaxRank;
 				end
-				
+
+
 				-- totem found. mark it as pending
 				-- --------------------------------
 				COE_Totem:SetPendingTotem( COE.TotemData[i], rank );

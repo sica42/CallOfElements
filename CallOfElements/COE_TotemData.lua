@@ -52,6 +52,7 @@ COE.TotemsAvailable["Air"] = 0;
 -------------------------------------------------------------------]]
 COE["ActiveTotems"] = { Earth = nil, Fire = nil, Water = nil, Air = nil };
 COE["TotemPending"] = { Totem = nil, UseRank = 0, Timeout = 0.75 };
+COE["TotemPendings"] = { };
 
 
 --[[ ----------------------------------------------------------------
