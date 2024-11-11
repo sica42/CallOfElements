@@ -1,3 +1,9 @@
+Added support for pepo nampower and ability to drop sets by name instead of by active set:  
+* `/coe throwset fireres`
+* `/coe throwset graceofair`
+
+---
+
 # CallOfElements for vanilla WOW
 
 This is an All-In-One Shaman class addon for World Of Warcraft.
