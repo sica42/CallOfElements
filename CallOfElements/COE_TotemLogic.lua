@@ -597,7 +597,7 @@ function COE_Totem:ThrowSet(set)
 			local totem = COE.TotemSets[activeset][element]; 
 			local active = COE.ActiveTotems[element]
 
-			if( totem and active ~= totem or (active and not active.isActive ) ) then
+			if( totem and (active ~= totem or (active and not active.isActive ) )) then
 				
 				if( totem.isTrinket ) then
 				
@@ -1027,9 +1027,9 @@ function COE_Totem:SetupTimerHooks()
 	end;
 
 	COE_Totem.TimerHooks["CastSpellByName"] = CastSpellByName;
-	CastSpellByName = function( SpellName,onself )
+	CastSpellByName = function( SpellName, onself )
 		COE_Totem:HookCastSpellByName( SpellName );
-		COE_Totem.TimerHooks["CastSpellByName"]( SpellName,onself );
+		COE_Totem.TimerHooks["CastSpellByName"]( SpellName, onself );
 	end;
 
 	COE_Totem.TimerHooks["UseInventoryItem"] = UseInventoryItem;
