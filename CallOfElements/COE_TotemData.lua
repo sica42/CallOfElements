@@ -298,7 +298,7 @@ function COE:ScanTotems()
 			
 			-- get totem mana cost from tooltip
 			-- ---------------------------------
-			text = COETotemTTTextLeft2;
+			local text = COETotemTTTextLeft2;
 			if( text and text:GetText() ) then
 			
 				local _,_, mana = string.find( text:GetText(), COESTR_TOTEMMANA );
@@ -423,7 +423,7 @@ function COE:GetTotemDurationAndHealth( spellid )
 
 	COETotemTTTextRight3:SetText( nil );
 	COETotemTT:SetSpell( spellid, BOOKTYPE_SPELL );
-	text = COETotemTTTextLeft5:GetText();
+	local text = COETotemTTTextLeft5:GetText();
 	
 	if( not text ) then
 		COE:DebugMessage( "nil text with id: " .. spellid );
