@@ -10,6 +10,19 @@
 	
 ]]
 
+local has_superwow = SetAutoloot and true or false
+
+local function OutOfRange(unit1,unit2,distance)
+	if not (has_superwow and UnitExists(unit1) and UnitExists(unit2) and UnitCanAssist(unit1,unit2)) then
+		return false
+	end
+
+	local x1,y1,z1 = UnitPosition(unit1)
+	local x2,y2,z2 = UnitPosition(unit2)
+
+	return math.sqrt((x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2) >= distance
+end
+
 if( not COE_Totem ) then 
 	COE_Totem = {};
 end 
@@ -575,9 +588,11 @@ end
 	PURPOSE: Throws the next totem in the active set that is not
 		yet thrown
 -------------------------------------------------------------------]]
-function COE_Totem:ThrowSet(set)
+function COE_Totem:ThrowSet(set,forced)
 
 	if( COE_Config:GetSaved( COEOPT_ENABLESETS ) == 1 ) then
+
+		forced = forced or (COE_Config:GetSaved( COEOPT_ENABLEFORCESETS ) == 1)
 
 		-- =======================================================================			
 		-- check which totem to throw
@@ -594,28 +609,30 @@ function COE_Totem:ThrowSet(set)
 		local k;
 		for k = 1,4 do
 			local element = COE:LocalizedElement( COE.TotemSets[activeset].CastOrder[k] );
-			local totem = COE.TotemSets[activeset][element]; 
-			local active = COE.ActiveTotems[element]
+			local totemData = COE.TotemSets[activeset][element]; 
+			local activeTotem = COE.ActiveTotems[element]
 
-			if( totem and (active ~= totem or (active and not active.isActive ) )) then
-				
-				if( totem.isTrinket ) then
-				
-					if( totem.TrinketSlot ) then
+			local isOutOfRange = COE_Config:GetSaved( COEOPT_ENABLEDISTANCECHECK ) == 1 and OutOfRange("player", activeTotem and activeTotem.guid or "",20)
+			local isForcedUpdate = forced
+			local isDifferentTotem = activeTotem ~= totemData
+			local isInactiveTotem = activeTotem and not activeTotem.isActive
+
+			if totemData and (isForcedUpdate or isDifferentTotem or isInactiveTotem or isOutOfRange) then
+				if( totemData.isTrinket ) then
+					if( totemData.TrinketSlot ) then
 						-- first check if the trinket is already usable
 						-- ---------------------------------------------
-						local start, duration = GetInventoryItemCooldown( "player", totem.TrinketSlot );
+						local start, duration = GetInventoryItemCooldown( "player", totemData.TrinketSlot );
 							
 						if( start == 0 and duration == 0 ) then
-							UseInventoryItem( totem.TrinketSlot );
+							UseInventoryItem( totemData.TrinketSlot );
 							return;
 						end
 					end
-				
 				else
 					-- first check if the totem is already usable
 					-- -------------------------------------------
-					local start, duration = GetSpellCooldown( totem.Ranks[totem.MaxRank].SpellID, BOOKTYPE_SPELL );
+					local start, duration = GetSpellCooldown( totemData.Ranks[totemData.MaxRank].SpellID, BOOKTYPE_SPELL );
 					
 					if( start == 0 and duration == 0 ) then
 						CastSpellByName( COE.TotemSets[activeset][element].SpellName );

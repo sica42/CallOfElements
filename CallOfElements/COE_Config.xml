@@ -353,6 +353,24 @@
 									</Anchor>
 								</Anchors>
 							</CheckButton>
+							<CheckButton name="COE_OptionEnableForceSets" inherits="COE_ConfigCheckButtonTemplate" id="91">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="158" y="-8"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="COE_OptionEnableDistanceCheck" inherits="COE_ConfigCheckButtonTemplate" id="92">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableForceSets" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
 							<CheckButton name="COE_OptionEnableAutoSwitch" inherits="COE_ConfigCheckButtonTemplate" id="11">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableSets" relativePoint="BOTTOMLEFT">

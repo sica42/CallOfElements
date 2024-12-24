@@ -12,6 +12,8 @@ if( not COE ) then
 	COE = {};
 end 
 
+local has_superwow = SetAutoloot and true or false
+
 COE_VERSION = 2.8
 
 COECOL_TOTEMWARNING = 1;
@@ -63,6 +65,9 @@ function COE:Init()
 		COE.Initialized = true;
 		COE:Message("Call of Elements v"..COE_VERSION.." mod CFM /coe");
 		this:RegisterEvent( "VARIABLES_LOADED" );
+		if has_superwow then
+			this:RegisterEvent( "UNIT_MODEL_CHANGED" );
+		end
 	
 		-- register shell command
 		-- -----------------------
@@ -85,6 +90,18 @@ function COE:OnEvent( event )
 		-- fix saved variables if this update has to do so
 		-- ------------------------------------------------
 		COE:FixSavedVariables();
+	elseif event == "UNIT_MODEL_CHANGED" then
+		if not UnitIsUnit(arg1.."owner","player") then return end
+
+		local _,_,totem_name = string.find(UnitName(arg1), "^(.- Totem)")
+		if not totem_name then return end
+
+		for element,totem in COE.ActiveTotems do
+			if totem.SpellName == totem_name then
+				COE.ActiveTotems[element].guid = arg1
+				break
+			end
+		end
 	end
 end
 
@@ -180,8 +197,8 @@ function COEProcessShellCommand( msg )
 	elseif( msg == "priorset" ) then
 		COE_Totem:SwitchToPriorSet();
 
-	elseif( msg == "throwset" ) then
-		COE_Totem:ThrowSet(arg);
+	elseif( msg == "throwset" or msg == "forcethrowset" ) then
+		COE_Totem:ThrowSet(arg, msg == "forcethrowset");
 		
 	elseif( msg == "restartset" ) then
 		COE_Totem:ResetSetCycle();

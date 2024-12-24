@@ -1,7 +1,10 @@
 Added support for pepo nampower and ability to drop sets by name instead of by active set:  
 * `/coe throwset fireres`
 * `/coe throwset graceofair`
+* `/coe forcethrowset graceofair` forcethrow will refresh existing totems regardless of settings
 
+Added config option for force re-dropping totems even if they're active.  
+Added (SuperWoW only) config option to re-drop totems that are active if they're more than 20y away.  
 ---
 
 # CallOfElements for vanilla WOW
