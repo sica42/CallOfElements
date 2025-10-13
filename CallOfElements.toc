@@ -5,7 +5,7 @@
 ## Version: 2.8t
 ## SavedVariables: COE_Saved, COEFramePositions
 ## SavedVariablesPerCharacter: COE_SavedTotemSets, COE_CustomTotemSets, COE_DisplayedTotems, COE_TotemBars
-Chronos.xml
+libs\Chronos.xml
 CallOfElements.xml
 COE_ConfigTemplates.xml
 COE_Config.xml
