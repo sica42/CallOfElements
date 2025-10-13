@@ -70,6 +70,7 @@ function COE_Totem:InitMainFrame()
 	this:RegisterEvent( "PLAYER_ENTERING_WORLD" );
 	this:RegisterEvent( "LEARNED_SPELL_IN_TAB" );
 	this:RegisterEvent( "PLAYER_TARGET_CHANGED" );
+	this:RegisterEvent( "PLAYER_AURAS_CHANGED" )
 	this:RegisterEvent( "PLAYER_DEAD" );
 
 	this:RegisterEvent( "CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS" );
@@ -118,6 +119,31 @@ function COE_Totem:OnMainFrameEvent( event )
 			-- Switch to class set if appropriate
 			-- -----------------------------------
 			COE_Totem:SwitchPVPSet();
+		end
+	elseif (event == "PLAYER_AURAS_CHANGED") then
+		local playerBuffs = {}
+
+		for i = 0, 31 do
+			local buffId, _ = GetPlayerBuff( i, "HELPFUL|HARMFUL|PASSIVE" )
+			if buffId >= 0 then
+				local texture = GetPlayerBuffTexture( buffId )
+				if texture then
+					playerBuffs[ texture ] = true
+				end
+			else
+				break
+			end
+		end
+
+		for _, totem in pairs( COE.ActiveTotems ) do
+			if playerBuffs[ totem.Texture ] then
+				totem.isBuff = true
+				totem.OutOfRange = false
+			else
+				if totem.isBuff then
+					totem.OutOfRange = true
+				end
+			end
 		end
 	elseif (event == "PLAYER_DEAD") then
 		-- reset all timers upon death
@@ -1480,7 +1506,11 @@ function COE_Totem:SetTimerText()
 			-- set the color
 			-- --------------
 			overlaytex:SetVertexColor( 0.1, 0.1, 0.1, 0.75 );
-			timertext:SetVertexColor( 1, 1, 1, 1 );
+			if this.totem.OutOfRange then
+				timertext:SetVertexColor( 1, 0, 0, 1 );
+			else
+				timertext:SetVertexColor( 1, 1, 1, 1 );
+			end
 
 			-- show text and overlay
 			-- ----------------------
@@ -1518,7 +1548,11 @@ function COE_Totem:SetTimerText()
 			-- set the color
 			-- --------------
 			overlaytex:SetVertexColor( 1, 1, 1, 1 );
-			timertext:SetVertexColor( 1, 0, 0, 1 );
+			if this.totem.OutOfRange then
+				timertext:SetVertexColor( 1, 0, 0, 1 );
+			else
+				timertext:SetVertexColor( 1, 1, 1, 1 );
+			end
 
 			-- show text and overlay
 			-- ----------------------
