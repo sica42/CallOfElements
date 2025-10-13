@@ -6,14 +6,14 @@
 --	By Alexander Brazie, Thott and AnduinLothar
 --
 --	Chronos manages time. You can schedule a function to be called
---	in X seconds, with or without an id. You can request a timer, 
---	which tracks the elapsed duration since the timer was started. 
+--	in X seconds, with or without an id. You can request a timer,
+--	which tracks the elapsed duration since the timer was started.
 --
 --  To use as an embeddable addon:
 --	- Put the Chronos folder inside your Interface/AddOns/<YourAddonName>/ folder.
 --	- Add Chronos\ Chronos.xml to your toc or load it in your xml before your localization files.
 --	- Add Chronos to the OptionalDeps in your toc
---	
+--
 --	To use as an addon library:
 --	- Put the Chronos folder inside your Interface/AddOns/ folder.
 --	- Add Chronos to the Dependencies in your toc
@@ -23,7 +23,7 @@
 --	$LastChangedBy: zespri $
 --	$Date: 2006-08-13 17:43:53 -0700 (Sun, 13 Aug 2006) $
 --	$Rev: 3875 $
---	
+--
 --]]
 
 local CHRONOS_REV = 2.01;
@@ -31,19 +31,19 @@ local CHRONOS_REV = 2.01;
 local isBetterInstanceLoaded = ( Chronos and Chronos.version and Chronos.version >= CHRONOS_REV );
 
 if (not isBetterInstanceLoaded) then
-	
+
 	if (not Chronos) then
 		Chronos = {};
 	end
-	
+
 	Chronos.version = CHRONOS_REV;
-	
+
 	------------------------------------------------------------------------------
 	--[[ Variables ]]--
 	------------------------------------------------------------------------------
-	
+
 	Chronos.online = true;
-	
+
 	CHRONOS_DEBUG = false;
 	CHRONOS_DEBUG_WARNINGS = false;
 
@@ -51,35 +51,35 @@ if (not isBetterInstanceLoaded) then
 	if (not ChronosData) then
 		ChronosData = {};
 	end
-		
+
 	-- Initialize the Timers
 	if (not ChronosData.timers) then
 		ChronosData.timers = {};
 	end
-	
+
 	-- Initialize the perform-over-time task list
 	if (not ChronosData.tasks) then
 		ChronosData.tasks = {};
 	end
-		
+
 	-- Maximum items per frame
 	Chronos.MAX_TASKS_PER_FRAME = 100;
-		
+
 	-- Maximum steps per task
 	Chronos.MAX_STEPS_PER_TASK = 300;
-	
+
 	-- Maximum time delay per frame
 	Chronos.MAX_TIME_PER_STEP = .3;
-		
+
 	Chronos.emptyTable = {};
 
 	------------------------------------------------------------------------------
 	--[[ User Functions ]]--
 	------------------------------------------------------------------------------
-	
+
 	--[[
 	-- debug(boolean)
-	-- 
+	--
 	-- Toggles debug mode
 	]]--
 	function Chronos.debug(enable)
@@ -93,7 +93,7 @@ if (not isBetterInstanceLoaded) then
 			CHRONOS_DEBUG_WARNINGS = false;
 		end
 	end
-	
+
 	--[[
 	-- Scheduling functions
 	-- Parts rewritten by AnduinLothar for efficiency
@@ -112,35 +112,35 @@ if (not isBetterInstanceLoaded) then
 	--
 	-- Also, please note that there is a limit to the number of
 	-- scheduled tasks that can be performed per xml object at the
-	-- same time. 
+	-- same time.
 	--]]
 	function Chronos.schedule(when,handler,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-		if ( not Chronos.online ) then 
+		if ( not Chronos.online ) then
 			return;
 		end
 		if ( not handler) then
 			Chronos.printError("ERROR: nil handler passed to Chronos.schedule()");
 			return;
 		end
-				
+
 		--local memstart = gcinfo();
 		-- -- Assign an id
 		-- local id = "";
-		-- if ( not this ) then 
+		-- if ( not this ) then
 		-- 	id = "Keybinding";
 		-- else
 		-- 	id = this:GetName();
 		-- end
-		-- if ( not id ) then 
+		-- if ( not id ) then
 		-- 	id = "_DEFAULT";
 		-- end
-		-- if ( not when ) then 
+		-- if ( not when ) then
 		-- 	Chronos.printDebugError("CHRONOS_DEBUG_WARNINGS", "Chronos Error Detection: ", id , " has sent no interval for this function. ", when );
 		-- 	return;
 		-- end
 
 		-- -- Ensure we're not looping ChronosFrame
-		-- if ( id == "ChronosFrame" and ChronosData.lastID ) then 
+		-- if ( id == "ChronosFrame" and ChronosData.lastID ) then
 		-- 	id = ChronosData.lastID;
 		-- end
 
@@ -158,7 +158,7 @@ if (not isBetterInstanceLoaded) then
 
 		-- task list is a heap, add new --Thott
 		while(i > 1) do
-			parent = floor(i/2);
+			local parent = math.floor(i/2);
 			if(ChronosData.sched[parent].time > ChronosData.sched[i].time) then
 				Chronos.swap(i,parent);
 			else
@@ -166,12 +166,12 @@ if (not isBetterInstanceLoaded) then
 			end
 			i = parent;
 		end
-		
+
 		-- Debug print
 		--Chronos.printDebugError("CHRONOS_DEBUG", "Scheduled ", handler," in ",when," seconds from ", id );
 		--Chronos.printError("Memory change in schedule: ",memstart,"->",memend," = ",memend-memstart);
 	end
-	
+
 
 	--[[
 	--	Chronos.scheduleByName(name, delay, function, arg1, ... );
@@ -183,7 +183,7 @@ if (not isBetterInstanceLoaded) then
 	--
 	--]]
 	function Chronos.scheduleByName(name,when,handler,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-		if ( not name ) then 
+		if ( not name ) then
 			Chronos.printDebugError("CHRONOS_DEBUG_WARNINGS","Chronos Error Detection: No name specified to Chronos.scheduleByName");
 			return;
 		end
@@ -219,27 +219,27 @@ if (not isBetterInstanceLoaded) then
 	--
 	--]]
 	function Chronos.unscheduleByName(name)
-		if ( not Chronos.online ) then 
+		if ( not Chronos.online ) then
 			return;
 		end
-		if ( not name ) then 
+		if ( not name ) then
 			Chronos.printError("No name specified to Chronos.unscheduleByName");
 			return;
 		end
 		if(ChronosData.byName[name]) then
 			ChronosData.byName[name] = nil;
 		end
-		
+
 		-- Debug print
 		--Chronos.printDebugError("CHRONOS_DEBUG", "Cancelled scheduled timer of name ",name);
 	end
-	
+
 	--[[
 	--	unscheduleRepeating(name);
 	--		Mirrors unscheduleByName for backwards compatibility
 	--]]
 	Chronos.unscheduleRepeating = Chronos.unscheduleByName;
-	
+
 	--[[
 	--	isScheduledByName(name)
 	--		Returns the amount of time left if it is indeed scheduled by name!
@@ -250,28 +250,28 @@ if (not isBetterInstanceLoaded) then
 	--
 	--]]
 	function Chronos.isScheduledByName(name)
-		if ( not Chronos.online ) then 
+		if ( not Chronos.online ) then
 			return;
 		end
-		if ( not name ) then 
+		if ( not name ) then
 			Chronos.printError("No name specified to Chronos.isScheduledByName ", this:GetName());
 			return;
 		end
 		if(ChronosData.byName[name]) then
 			return ChronosData.byName[name].time - GetTime();
 		end
-		
+
 		-- Debug print
 		--Chronos.printDebugError("CHRONOS_DEBUG", "Did not find timer of name ",name);
 		return nil;
 	end
-	
+
 	--[[
-	--	isScheduledRepeating(name)	
+	--	isScheduledRepeating(name)
 	--		Mirrors isScheduledByName for backwards compatibility
 	--]]
 	Chronos.isScheduledRepeating = Chronos.isScheduledByName;
-	
+
 	--[[
 	--	Chronos.scheduleRepeating(name, delay, function);
 	--
@@ -279,7 +279,7 @@ if (not isBetterInstanceLoaded) then
 	--
 	--]]
 	function Chronos.scheduleRepeating(name,when,handler)
-		if ( not name ) then 
+		if ( not name ) then
 			Chronos.printDebugError("CHRONOS_DEBUG_WARNINGS","Chronos Error Detection: No name specified to Chronos.scheduleRepeating");
 			return;
 		end
@@ -304,7 +304,7 @@ if (not isBetterInstanceLoaded) then
 			ChronosData.byName[name] = { time = when+GetTime(), period = when, handler = handler, repeating = true };
 		end
 	end
-	
+
 	--[[
 	--	Chronos.flushByName(name, when);
 	--
@@ -312,7 +312,7 @@ if (not isBetterInstanceLoaded) then
 	--
 	--]]
 	function Chronos.flushByName(name,when)
-		if ( not name ) then 
+		if ( not name ) then
 			Chronos.printDebugError("CHRONOS_DEBUG_WARNINGS","Chronos Error Detection: No name specified to Chronos.flushByName");
 			return;
 		elseif ( not ChronosData.byName[name] ) then
@@ -335,19 +335,19 @@ if (not isBetterInstanceLoaded) then
 	--
 	--	Args
 	--		ID - optional parameter to identify who is asking for a timer.
-	--		
-	--		If ID does not exist, this:GetName() is used. 
 	--
-	--	When you want to get the amount of time passed since startTimer(ID) is called, 
-	--	call getTimer(ID) and it will return the number in seconds. 
+	--		If ID does not exist, this:GetName() is used.
+	--
+	--	When you want to get the amount of time passed since startTimer(ID) is called,
+	--	call getTimer(ID) and it will return the number in seconds.
 	--
 	--]]
-	function Chronos.startTimer( id ) 
-		if ( not Chronos.online ) then 
+	function Chronos.startTimer( id )
+		if ( not Chronos.online ) then
 			return;
 		end
 
-		if ( not id ) then 
+		if ( not id ) then
 			id = this:GetName();
 		end
 
@@ -363,14 +363,14 @@ if (not isBetterInstanceLoaded) then
 			return;
 		end
 
-		-- Add a new timer entry 
+		-- Add a new timer entry
 		table.insert(ChronosData.timers[id],GetTime());
 	end
 
 
 	--[[
 	--	endTimer([id]);
-	-- 
+	--
 	--		Ends the timer and returns the amount of time passed.
 	--
 	--	args:
@@ -381,23 +381,23 @@ if (not isBetterInstanceLoaded) then
 	--		(Number delta, Number start, Number end)
 	--
 	--		delta - the amount of time passed in seconds.
-	--		start - the starting time 
+	--		start - the starting time
 	--		now - the time the endTimer was called.
 	--]]
 
-	function Chronos.endTimer( id ) 
-		if ( not Chronos.online ) then 
+	function Chronos.endTimer( id )
+		if ( not Chronos.online ) then
 			return;
 		end
 
-		if ( not id ) then 
+		if ( not id ) then
 			id = this:GetName();
 		end
 
 		if ( not ChronosData.timers[id] or ChronosData.timers[id].n == 0) then
 			return nil;
 		end
-	
+
 		local now = GetTime();
 
 		-- Grab the last timer called
@@ -409,7 +409,7 @@ if (not isBetterInstanceLoaded) then
 
 	--[[
 	--	getTimer([id]);
-	-- 
+	--
 	--		Gets the timer and returns the amount of time passed.
 	--		Does not terminate the timer.
 	--
@@ -421,16 +421,16 @@ if (not isBetterInstanceLoaded) then
 	--		(Number delta, Number start, Number end)
 	--
 	--		delta - the amount of time passed in seconds.
-	--		start - the starting time 
+	--		start - the starting time
 	--		now - the time the endTimer was called.
 	--]]
 
-	function Chronos.getTimer( id ) 
-		if ( not Chronos.online ) then 
+	function Chronos.getTimer( id )
+		if ( not Chronos.online ) then
 			return;
 		end
 
-		if ( not id ) then 
+		if ( not id ) then
 			id = this:GetName();
 		end
 
@@ -438,17 +438,17 @@ if (not isBetterInstanceLoaded) then
 		if ( not ChronosData.timers[id] or ChronosData.timers[id].n == 0) then
 			return 0,0,now;
 		end
-	
+
 		-- Grab the last timer called
 		local startTime = ChronosData.timers[id][ChronosData.timers[id].n];
 
 		return (now - startTime), startTime, now;
 	end
-	
+
 	--[[
 	--	isTimerActive([id])
-	--		returns true if the timer exists. 
-	--		
+	--		returns true if the timer exists.
+	--
 	--	args:
 	--		id - ID for the timer. If not specified, then ID will
 	--		be this:GetName()
@@ -457,12 +457,12 @@ if (not isBetterInstanceLoaded) then
 	--		true - exists
 	--		false - does not
 	--]]
-	function Chronos.isTimerActive( id ) 
-		if ( not Chronos.online ) then 
+	function Chronos.isTimerActive( id )
+		if ( not Chronos.online ) then
 			return;
 		end
 
-		if ( not id ) then 
+		if ( not id ) then
 			id = this:GetName();
 		end
 
@@ -481,13 +481,13 @@ if (not isBetterInstanceLoaded) then
 	--
 	--	returns:
 	--		(elapsedTime)
-	--		
+	--
 	--		elapsedTime - time in seconds since Chronos initialized
-	--]]	
-	function Chronos.getTime() 
+	--]]
+	function Chronos.getTime()
 		return ChronosData.elapsedTime;
 	end
-	
+
 	--[[
 	--	Chronos.afterInit(func, ...)
 	--		Performs func after the game has truely started.
@@ -520,12 +520,12 @@ if (not isBetterInstanceLoaded) then
 			ChronosData.afterInit.n = n;
 		end
 	end
-	
-	
+
+
 	------------------------------------------------------------------------------
 	--[[ Helpers Functions ]]--
 	------------------------------------------------------------------------------
-	
+
 	function Chronos.getArgTable(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
 		if (( a1 == nil ) and ( a2 == nil ) and ( a3 == nil ) and ( a4 == nil ) and ( a5 == nil ) and ( a6 == nil ) and ( a7 == nil ) and ( a8 == nil ) and ( a9 == nil ) and ( a10 == nil ) and ( a11 == nil ) and ( a12 == nil ) and ( a13 == nil ) and ( a14 == nil ) and ( a15 == nil ) and ( a16 == nil ) and ( a17 == nil ) and ( a18 == nil ) and ( a19 == nil ) and ( a20 == nil )) then
 			return Chronos.emptyTable;
@@ -555,7 +555,7 @@ if (not isBetterInstanceLoaded) then
 			return args;
 		end
 	end
-	
+
 	--
 	-- pop ( table )
 	--
@@ -574,7 +574,7 @@ if (not isBetterInstanceLoaded) then
 			Chronos.printDebugError(nil, "Bad table.getn() passed to pop");
 			return nil;
 		end
-		if ( n == 0 ) then 
+		if ( n == 0 ) then
 			return nil;
 		end
 
@@ -582,9 +582,9 @@ if (not isBetterInstanceLoaded) then
 		table.setn(table1, n-1)
 		--Doesn't nil the entry like table.remove, so it's never garbage collected and can be replaced
 		--v = table.remove(table1);
-		return v;		
+		return v;
 	end
-	
+
 	function Chronos.popTask()
 		if(ChronosData.sched.n == 1) then
 			ChronosData.sched.n = 0;
@@ -612,7 +612,7 @@ if (not isBetterInstanceLoaded) then
 		end
 		return ChronosData.sched.n+1;
 	end
-	
+
 	function Chronos.run(func,arg)
 		if(func) then
 			if(arg) then
@@ -628,34 +628,34 @@ if (not isBetterInstanceLoaded) then
 		ChronosData.sched[i] = ChronosData.sched[j];
 		ChronosData.sched[j] = t;
 	end
-	
+
 	function Chronos.printError(text)
 		ChatFrame1:AddMessage(text, RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b, 1.0, UIERRORS_HOLD_TIME);
 	end
-	
+
 	function Chronos.printDebugError(var, text)
 		if (var) and (getglobal(var)) then
 			Chronos.printError(text);
 		end
 	end
-	
+
 	------------------------------------------------------------------------------
 	--[[ Frame Script Helpers ]]--
 	------------------------------------------------------------------------------
-	
+
 	function Chronos.chatColorsInit()
 		ChronosData.chatColorsInitialized = true;
 		ChronosFrame:UnregisterEvent("UPDATE_CHAT_COLOR");
 	end
-	
+
 	function Chronos.initCheck()
 		if(not ChronosData.initialized) then
 			if(UnitName("player") and UnitName("player")~=UKNOWNBEING and UnitName("player")~=UNKNOWNBEING and UnitName("player")~=UNKNOWNOBJECT and ChronosData.variablesLoaded and ChronosData.enteredWorld and ChronosData.chatColorsInitialized) then
 				ChronosData.initialized = true;
-				Chronos.schedule(1,Chronos.initCheck); 
+				Chronos.schedule(1,Chronos.initCheck);
 				return;
 			else
-				Chronos.schedule(0.2,Chronos.initCheck); 
+				Chronos.schedule(0.2,Chronos.initCheck);
 				return;
 			end
 		end
@@ -676,7 +676,7 @@ if (not isBetterInstanceLoaded) then
 			end
 		end
 	end
-	
+
 	--[[
 	--	Sends a chat command through the standard editbox
 	--]]
@@ -686,7 +686,7 @@ if (not isBetterInstanceLoaded) then
 		ChatEdit_SendText(ChatFrameEditBox);
 		ChatFrameEditBox:SetText(text);
 	end
-	
+
 	function Chronos.RegisterSlashCommands()
 		--Needs to be able Variables load if you want to use Sky
 		local chronosFunc = function(msg)
@@ -713,14 +713,14 @@ if (not isBetterInstanceLoaded) then
 			for i = 1, table.getn(SCHEDULE_COMM) do setglobal("SLASH_CHRONOS_SCHEDULE"..i, SCHEDULE_COMM[i]); end
 		end
 	end
-	
+
 	------------------------------------------------------------------------------
 	--[[ Frame Scripts ]]--
 	------------------------------------------------------------------------------
-	
+
 	function Chronos.OnLoad()
 		Chronos.framecount = 0;
-		
+
 		if (not ChronosData.byName) then
 			ChronosData.byName = {};
 		end
@@ -732,10 +732,10 @@ if (not isBetterInstanceLoaded) then
 			ChronosData.sched.n = 0;
 		end
 		ChronosData.elapsedTime = 0;
-		
+
 		Chronos.afterInit(Chronos.RegisterSlashCommands);
 	end
-	
+
 	function Chronos.OnEvent()
 		if(event == "VARIABLES_LOADED") then
 			ChronosData.variablesLoaded = true;
@@ -747,23 +747,23 @@ if (not isBetterInstanceLoaded) then
 			Chronos.online = false;
 		elseif ( event == "UPDATE_CHAT_COLOR" ) then
 			Chronos.scheduleByName("ChronosAfterChatColorInit", 1, Chronos.chatColorsInit);
-		end	
+		end
 	end
-	
+
 	function Chronos.OnUpdate_Quick()
-		if ( not Chronos.online ) then 
+		if ( not Chronos.online ) then
 			return;
 		end
-		if ( not ChronosData.variablesLoaded ) then 
+		if ( not ChronosData.variablesLoaded ) then
 			return;
 		end
-		
+
 		if ( ChronosData.elapsedTime ) then
 			ChronosData.elapsedTime = ChronosData.elapsedTime + arg1;
 		else
 			ChronosData.elapsedTime = arg1;
 		end
-		
+
 		-- Execute scheduled tasks that are ready, popping them off the heap.
 		local now = GetTime();
 		local i;
@@ -775,7 +775,7 @@ if (not isBetterInstanceLoaded) then
 				break;
 			end
 		end
-		
+
 		-- Execute named scheduled tasks that are ready.
 		local k,v = next(ChronosData.byName);
 		local newK, newV;
@@ -794,22 +794,22 @@ if (not isBetterInstanceLoaded) then
 			k,v = newK,newV;
 		end
 	end
-	
+
 	function Chronos.OnUpdate_Debug()
-		if ( not Chronos.online ) then 
+		if ( not Chronos.online ) then
 			return;
 		end
-		if ( not ChronosData.variablesLoaded ) then 
+		if ( not ChronosData.variablesLoaded ) then
 			return;
 		end
 		local memstart = gcinfo();
-		
+
 		if ( ChronosData.elapsedTime ) then
 			ChronosData.elapsedTime = ChronosData.elapsedTime + arg1;
 		else
 			ChronosData.elapsedTime = arg1;
 		end
-	
+
 		local now = GetTime();
 		local i;
 		-- Execute scheduled tasks that are ready, popping them off the heap.
@@ -821,12 +821,12 @@ if (not isBetterInstanceLoaded) then
 				break;
 			end
 		end
-		
+
 		local memend = gcinfo();
 		if(memend - memstart > 0) then
 			Chronos.printError("gcmemleak from ChronosData.sched in OnUpdate: ",memend - memstart);
 		end
-		
+
 		-- Execute named scheduled tasks that are ready.
 		memstart = memend;
 		local k,v = next(ChronosData.byName);
@@ -848,17 +848,17 @@ if (not isBetterInstanceLoaded) then
 			end
 			k,v = newK,newV;
 		end
-		
+
 		memend = gcinfo();
 		if(memend - memstart > 0) then
 			Chronos.printError("gcmemleak from ChronosData.byName in OnUpdate: ",memend - memstart);
 		end
 	end
-	
+
 	------------------------------------------------------------------------------
 	--[[ Frame Script Assignment ]]--
 	------------------------------------------------------------------------------
-	
+
 	--Event Driver
 	if (not ChronosFrame) then
 		CreateFrame("Frame", "ChronosFrame");
@@ -874,6 +874,6 @@ if (not isBetterInstanceLoaded) then
 	ChronosFrame:SetScript("OnUpdate", Chronos.OnUpdate_Quick);
 	--OnLoad Call
 	Chronos.OnLoad();
-	
+
 end
 
