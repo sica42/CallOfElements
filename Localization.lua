@@ -42,14 +42,14 @@ COESTR_MINUTEDURATION = "(%d%.%d%d) min";
 COESTR_MINUTEDURATION_INT = "(%d) min";
 COESTR_SECDURATION = "(%d%d?) sec";
 COESTR_CASTBYNAME = "%(Rank (%d)%)";
-COESTR_TOTEMDAMAGE = { ".+ [crh]+its (.+ Totem) ?%u* for (%d+).*" };
+COESTR_TOTEMDAMAGE = { ".+ [crh]+its (.+ Totem) ?%u* %(%a+%) for (%d+).*" };
 COESTR_TOTEMHEALTH = { "(%d*) health" };
 COESTR_SHOCKSPELL = "(%a* Shock)";
 COESTR_HEALINGWAVE = "Healing Wave";
 COESTR_LESSERWAVE = "Lesser Healing Wave";
 COESTR_MINAMOUNT = "(%d*) to";
 COESTR_MAXAMOUNT = "to (%d*)";
-COESTR_TRINKET = "^.*%[Enamored Water Spirit%].*$"; 
+COESTR_TRINKET = "^.*%[Enamored Water Spirit%].*$";
 COESTR_TOTEMICRECALL = "Totemic Recall"
 
 -- Totem Advisor
@@ -70,10 +70,10 @@ COESTR_TREMOR = {
 -- Totems
 -- -------------
 COESTR_TOTEMEARTHBIND = "Earthbind Totem";
-COESTR_TOTEMFLAMETONGUE = "Flametongue Totem"; 
+COESTR_TOTEMFLAMETONGUE = "Flametongue Totem";
 COESTR_TOTEMMAGMA = "Magma Totem";
 COESTR_TOTEMMANA_TIDE = "Mana Tide Totem";
-COESTR_TOTEMSTONECLAW = "Stoneclaw Totem"; 
+COESTR_TOTEMSTONECLAW = "Stoneclaw Totem";
 COESTR_TOTEMWINDFURY = "Windfury Totem";
 
 -- Tools
@@ -154,7 +154,7 @@ COE_OptionFixBar = "Fixes the totem bar position\nto prevent dragging it acciden
 COE_OptionGroupBars = "When you drag one bar,\nthe other bars will follow";
 }
 
-COESTR_TRINKET_TOOLTIP = "Enamored Water Spirit"; 
+COESTR_TRINKET_TOOLTIP = "Enamored Water Spirit";
 COESTR_TRINKET_TOTEM = "Ancient Mana Spring Totem";
 
 -- Combo boxes
@@ -162,7 +162,7 @@ COESTR_TRINKET_TOTEM = "Ancient Mana Spring Totem";
 COEUI_TTALIGN = {
 { "ANCHOR_TOPLEFT"; "Top Left" };
 { "ANCHOR_LEFT"; "Left" };
-{ "ANCHOR_BOTTOMLEFT"; "Bottom Left" }; 
+{ "ANCHOR_BOTTOMLEFT"; "Bottom Left" };
 { "ANCHOR_TOPRIGHT"; "Top Right" };
 { "ANCHOR_RIGHT"; "Right" };
 { "ANCHOR_BOTTOMRIGHT"; "Bottom Right" };
@@ -170,10 +170,10 @@ COEUI_TTALIGN = {
 }
 
 COEUI_DISPLAYMODE = { "Customize", "Timers Only", "Active Set" }
- 
+
 COEUI_DISPLAYALIGN = { "Box", "Vertical", "Horizontal" }
 
-COEUI_PVPSETS = { "[PVP] Druid", "[PVP] Hunter", "[PVP] Mage", "[PVP] Paladin", "[PVP] Priest", 
+COEUI_PVPSETS = { "[PVP] Druid", "[PVP] Hunter", "[PVP] Mage", "[PVP] Paladin", "[PVP] Priest",
 	"[PVP] Rogue", "[PVP] Shaman", "[PVP] Warlock", "[PVP] Warrior" }
 COEUI_DEFAULTSET = "Default";
 

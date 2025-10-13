@@ -43,15 +43,15 @@ COESTR_MINUTEDURATION = "(%d[%.,]%d%d) Min";
 COESTR_MINUTEDURATION_INT = "(%d) Min";
 COESTR_SECDURATION = "(%d%d?) Sek";
 COESTR_CASTBYNAME = "%(Rang (%d)%)";
-COESTR_TOTEMDAMAGE = { ".+ trifft (Totem .-) ?%u*%.? kritisch f\195\188r (%d+).",
-	".+ trifft (Totem .-) ?%u*%.? f\195\188r (%d+)." }; 
-COESTR_TOTEMHEALTH = { "(%d*) Punkt%(en%) Gesundheit"; "(%d*) Gesundheit" }; 
+COESTR_TOTEMDAMAGE = { ".+ trifft (Totem .-) ?%u*%.? %(%a+%) kritisch f\195\188r (%d+).",
+	".+ trifft (Totem .-) ?%u*%.? %(%a+%) f\195\188r (%d+)." };
+COESTR_TOTEMHEALTH = { "(%d*) Punkt%(en%) Gesundheit"; "(%d*) Gesundheit" };
 COESTR_SHOCKSPELL = "(%a*schock)";
 COESTR_HEALINGWAVE = "Welle der Heilung";
 COESTR_LESSERWAVE = "Geringe Welle der Heilung";
 COESTR_MINAMOUNT = "(%d*) bis";
 COESTR_MAXAMOUNT = "bis (%d*)";
-COESTR_TRINKET = "^.*%[Entz\195\188ckter Wassergeist%].*$"; 
+COESTR_TRINKET = "^.*%[Entz\195\188ckter Wassergeist%].*$";
 COESTR_TOTEMICRECALL = "Ruf der Totems" -- Need translation
 
 -- Totem Advisor
@@ -144,7 +144,7 @@ COE_OptionFixBar = "Fixiert die Totemleiste, so dass sie nicht mehr\nversehentli
 COE_OptionGroupBars = "Wenn Ihr eine Leiste zieht,\nfolgen die anderen Leisten der Bewegung";
 }
 
-COESTR_TRINKET_TOOLTIP = "Entz\195\188ckter Wassergeist"; 
+COESTR_TRINKET_TOOLTIP = "Entz\195\188ckter Wassergeist";
 COESTR_TRINKET_TOTEM = "Uraltes Totem der Manaquelle";
 
 
@@ -153,7 +153,7 @@ COESTR_TRINKET_TOTEM = "Uraltes Totem der Manaquelle";
 COEUI_TTALIGN = {
 { "ANCHOR_TOPLEFT"; "Oben links" };
 { "ANCHOR_LEFT"; "Links" };
-{ "ANCHOR_BOTTOMLEFT"; "Unten links" }; 
+{ "ANCHOR_BOTTOMLEFT"; "Unten links" };
 { "ANCHOR_TOPRIGHT"; "Oben rechts" };
 { "ANCHOR_RIGHT"; "Rechts" };
 { "ANCHOR_BOTTOMRIGHT"; "Unten rechts" };
@@ -164,7 +164,7 @@ COEUI_DISPLAYMODE = { "Benutzerdefiniert", "Nur Timer", "Aktives Set" }
 
 COEUI_DISPLAYALIGN = { "Box", "Vertikal", "Horizontal" }
 
-COEUI_PVPSETS = { "[PVP] Druide", "[PVP] Hexer", "[PVP] J\195\164ger", "[PVP] Krieger", "[PVP] Magier", 
+COEUI_PVPSETS = { "[PVP] Druide", "[PVP] Hexer", "[PVP] J\195\164ger", "[PVP] Krieger", "[PVP] Magier",
 	"[PVP] Paladin", "[PVP] Priester", "[PVP] Schamane", "[PVP] Schurke" }
 COEUI_DEFAULTSET = "Standardset";
 

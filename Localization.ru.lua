@@ -45,14 +45,14 @@ COESTR_MINUTEDURATION_INT = "(%d) мин";
 COESTR_SECDURATION = "(%d%d?) сек";
 COESTR_CASTBYNAME = "%(Уровень (%d)%)";
 --COESTR_TOTEMDAMAGE = { ".+ [crh]+its (.+ Totem) ?%u* for (%d+).*" };
-COESTR_TOTEMDAMAGE = { ".+ [crн]+аносит (Тотем .+) ?%u* (%d+) ед. урона" };
+COESTR_TOTEMDAMAGE = { ".+ [crн]+аносит (Тотем .+) ?%u* %(%a+%) (%d+) ед. урона" };
 COESTR_TOTEMHEALTH = { "(%d*) здоровья" };
 COESTR_SHOCKSPELL = "(%a* шок)";
 COESTR_HEALINGWAVE = "Волна исцеления";
 COESTR_LESSERWAVE = "Малая волна исцеления";
 COESTR_MINAMOUNT = "(%d*) к";
 COESTR_MAXAMOUNT = "к (%d*)";
-COESTR_TRINKET = "^.*%[Влюбленный водный дух%].*$"; 
+COESTR_TRINKET = "^.*%[Влюбленный водный дух%].*$";
 COESTR_TOTEMICRECALL = "Зов тотема" -- Need translation
 
 -- Totem Advisor
@@ -73,10 +73,10 @@ COESTR_TREMOR = {
 -- Totems
 -- -------------
 COESTR_TOTEMEARTHBIND = "Тотем оков земли";
-COESTR_TOTEMFLAMETONGUE = "Тотем языка пламени"; 
+COESTR_TOTEMFLAMETONGUE = "Тотем языка пламени";
 COESTR_TOTEMMAGMA = "Тотем магмы";
 COESTR_TOTEMMANA_TIDE = "Тотем прилива маны";
-COESTR_TOTEMSTONECLAW = "Тотем каменного когтя"; 
+COESTR_TOTEMSTONECLAW = "Тотем каменного когтя";
 COESTR_TOTEMWINDFURY = "Тотем неистовства ветра";
 
 -- Tools
@@ -169,7 +169,7 @@ COEUI_TTALIGN = {
 }
 
 COEUI_DISPLAYMODE = { "Настроить", "Только таймер", "Активные сеты" }
- 
+
 COEUI_DISPLAYALIGN = { "Бокс", "Вертикально", "Горизонтально" }
 
 COEUI_PVPSETS = { "[PVP] Друид", "[PVP] Охотник", "[PVP] Маг", "[PVP] Паладин", "[PVP] Прист",

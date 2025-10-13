@@ -850,18 +850,13 @@ end
 		a notification if the totem is destroyed
 -------------------------------------------------------------------]]
 function COE_Totem:TotemDamage()
-	for num, regex in COESTR_TOTEMDAMAGE do
+	for _, regex in COESTR_TOTEMDAMAGE do
 		local _, _, spellName, dmg = string.find(arg1, regex);
-		--local match = { string.gfind( arg1, regex )() };
 		if (spellName and dmg) then
 			-- find totem
-
-			--	DEFAULT_CHAT_FRAME:AddMessage(match[1].." find totem-match[1]")
-
 			-- -----------
 			for i = 1, COE.TotemCount do
 				if (COE.TotemData[ i ].SpellName == spellName) then
-					--	DEFAULT_CHAT_FRAME:AddMessage(match[2].." damage-match[2]")
 					-- subtract damage
 					-- ----------------
 					COE.TotemData[ i ].CurHealth = COE.TotemData[ i ].CurHealth - tonumber( dmg );

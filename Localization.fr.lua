@@ -43,14 +43,14 @@ COESTR_MINUTEDURATION = "(%d%.%d%d) min";
 COESTR_MINUTEDURATION_INT = "(%d) min";
 COESTR_SECDURATION = "(%d%d?) sec";
 COESTR_CASTBYNAME = "%(Rang (%d)%)";
-COESTR_TOTEMDAMAGE = { ".+ [crh]+touche (.+ Totem) ?%u* pour (%d+).*" };
+COESTR_TOTEMDAMAGE = { ".+ [crh]+touche (.+ Totem) ?%u* %(%a+%) pour (%d+).*" };
 COESTR_TOTEMHEALTH = { "(%d*) points de vie" };
 COESTR_SHOCKSPELL = "(Horion de %a*)";
 COESTR_HEALINGWAVE = "Vague de soins";
 COESTR_LESSERWAVE = "Vague de soins inf\195\169rieurs";
 COESTR_MINAMOUNT = "(%d*).\195\160";
 COESTR_MAXAMOUNT = "\195\160.(%d*)";
-COESTR_TRINKET = "^.*%[Esprit de l\039eau amoureux%].*$"; 
+COESTR_TRINKET = "^.*%[Esprit de l\039eau amoureux%].*$";
 COESTR_TOTEMICRECALL = "Appel tot\195\169mique" -- Need translation
 
 -- Totem Advisor
@@ -66,7 +66,7 @@ COESTR_TREMOR = {
 	"Sommeil", "Terrifier", "Cri psychique", "Contr\195\180le mental", "Rugissement", "Peur",
 	"Cri d'intimidation", "Panique", "Hurlement strident", "S\195\169duction",
 	"Hurlement de terreur", "Grondement d'intimidation", "L\195\169thargie cristalline"
-} 
+}
 
 -- Tools
 -- ---------
@@ -142,7 +142,7 @@ COE_OptionFixBar = "V\195\169rouille la position de la barre\nafin d'\195\169vit
 COE_OptionGroupBars = "Lorsque vous d\195\169placer une barre,\nles autres sont d\195\169plac\195\169es en m\195\170me temps";
 }
 
-COESTR_TRINKET_TOOLTIP = "Esprit de l\039eau amoureux"; 
+COESTR_TRINKET_TOOLTIP = "Esprit de l\039eau amoureux";
 COESTR_TRINKET_TOTEM = "Ressort Antique De Mana";
 
 
@@ -151,7 +151,7 @@ COESTR_TRINKET_TOTEM = "Ressort Antique De Mana";
 COEUI_TTALIGN = {
 { "ANCHOR_TOPLEFT"; "Haut gauche" };
 { "ANCHOR_LEFT"; "Gauche" };
-{ "ANCHOR_BOTTOMLEFT"; "Bas gauche" }; 
+{ "ANCHOR_BOTTOMLEFT"; "Bas gauche" };
 { "ANCHOR_TOPRIGHT"; "Haut droite" };
 { "ANCHOR_RIGHT"; "Droite" };
 { "ANCHOR_BOTTOMRIGHT"; "Bas droite" };
@@ -159,10 +159,10 @@ COEUI_TTALIGN = {
 }
 
 COEUI_DISPLAYMODE = { "Customize", "Timers", "Set actif" }
- 
+
 COEUI_DISPLAYALIGN = { "Box", "Vertical", "Horizontal" }
 
-COEUI_PVPSETS = { "[PVP] Druide", "[PVP] Chasseur", "[PVP] Mage", "[PVP] Paladin", "[PVP] Pr\195\170tre", 
+COEUI_PVPSETS = { "[PVP] Druide", "[PVP] Chasseur", "[PVP] Mage", "[PVP] Paladin", "[PVP] Pr\195\170tre",
 	"[PVP] Voleur", "[PVP] Chaman", "[PVP] D\195\169moniste", "[PVP] Guerrier" }
 COEUI_DEFAULTSET = "D\195\169faut";
 
@@ -258,4 +258,4 @@ end
 -- ù  \195\185
 -- ß  \195\159
 -- DEFAULT_CHAT_FRAME:AddMessage(element);
--- COE:DebugMessage( "mcaoua:"..);	
+-- COE:DebugMessage( "mcaoua:"..);
