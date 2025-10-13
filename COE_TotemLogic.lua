@@ -536,7 +536,7 @@ function COE_Totem:ThrowSet( set, forced )
 		local source = COE.TotemSets
 
 		local setfound = false
-		if set then
+		if set and set ~= "" then
 			activeset = COE_Totem:GetSetIndex( set )
 			if not activeset then return end -- none found, but custom was specified, exit function
 		end
