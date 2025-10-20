@@ -10,14 +10,16 @@
 
 ]]
 
----@diagnostic disable-next-line: undefined-global
-local has_superwow = SetAutoloot and true or false
+if (not COE_Totem) then
+	COE_Totem = {};
+end
 
 ---@param unit1 UnitId
 ---@param unit2 UnitId
----@param distance any
-local function OutOfRange( unit1, unit2, distance )
-	if not (has_superwow and UnitExists( unit1 ) and UnitExists( unit2 ) and UnitCanAssist( unit1, unit2 )) then
+---@param distance number
+---@return boolean OutOfRange
+function COE_Totem:OutOfRange( unit1, unit2, distance )
+	if not (COE.has_superwow and UnitExists( unit1 ) and UnitExists( unit2 ) and UnitCanAssist( unit1, unit2 )) then
 		return false
 	end
 
@@ -25,10 +27,6 @@ local function OutOfRange( unit1, unit2, distance )
 	local x2, y2, z2 = UnitPosition( unit2 )
 
 	return math.sqrt( (x2 - x1) ^ 2 + (y2 - y1) ^ 2 + (z2 - z1) ^ 2 ) >= distance
-end
-
-if (not COE_Totem) then
-	COE_Totem = {};
 end
 
 --[[ ----------------------------------------------------------------
@@ -161,7 +159,6 @@ function COESched_RunAdvisor()
 
 	-- scan party
 	-- -----------
-	local i;
 	for i = 1, GetNumPartyMembers() do
 		if (warnPoison and warnDisease and warnTremor) then
 			break;
@@ -226,6 +223,25 @@ function COESched_RunAdvisor()
 	Chronos.scheduleByName( "COEAdvise", COE.AdvisorInterval, COESched_RunAdvisor );
 end
 
+function COESched_RunRecallCheck()
+	local activeTotems = 0
+	local outOfRangeTotems = 0
+
+	for _, totem in COE.ActiveTotems do
+		if totem.isActive then activeTotems = activeTotems + 1 end
+		if totem.OutOfRange then outOfRangeTotems = outOfRangeTotems + 1 end
+	end
+
+	if not COE.RecallReminded and activeTotems > 0 and activeTotems == outOfRangeTotems then
+		COE.RecallReminded = true
+		COE:Notification( COESTR_RECALL, COECOL_TOTEMDESTROYED );
+	end
+
+	-- reschedule
+	-- -----------
+	Chronos.scheduleByName( "COERecallReminder", COE.RecallReminderInterval, COESched_RunRecallCheck );
+end
+
 --[[ ----------------------------------------------------------------
 	METHOD: COE_Totem:ScanTargetForDebuff
 
@@ -259,7 +275,6 @@ function COE_Totem:ScanTargetForDebuff( target )
 				-- check if it's a debuff curable
 				-- by the tremor totem
 				-- -------------------------------
-				local debuff;
 				for debuff in COESTR_TREMOR do
 					if (debuffname == COESTR_TREMOR[ debuff ]) then
 						tremor = true;
@@ -546,7 +561,7 @@ function COE_Totem:ThrowSet( set, forced )
 			local totemData = COE.TotemSets[ activeset ][ element ];
 			local activeTotem = COE.ActiveTotems[ element ]
 
-			local isOutOfRange = COE_Config:GetSaved( COEOPT_ENABLEDISTANCECHECK ) == 1 and activeTotem and activeTotem.guid and OutOfRange( "player", activeTotem.guid, 20 )
+			local isOutOfRange = COE_Config:GetSaved( COEOPT_ENABLEDISTANCECHECK ) == 1 and activeTotem and activeTotem.guid and COE_Totem:OutOfRange( "player", activeTotem.guid, 20 )
 			local isForcedUpdate = forced
 			local isDifferentTotem = activeTotem ~= totemData
 			local isInactiveTotem = activeTotem and not activeTotem.isActive
@@ -1034,7 +1049,6 @@ function COE_Totem:HookCastSpell( id, book )
 	if not isTotemicRecall( id ) then
 		-- get the associated totem object
 		-- --------------------------------
-		local i, k, totem;
 		for i = 1, COE.TotemCount do
 			for k = 1, COE.TotemData[ i ].MaxRank do
 				if (COE.TotemData[ i ].Ranks[ k ].SpellID == id) then
@@ -1075,7 +1089,6 @@ function COE_Totem:HookCastSpellByName( SpellName )
 	if not isTotemicRecall( spell ) then
 		-- get the associated totem object
 		-- --------------------------------
-		local i, k, totem;
 		for i = 1, COE.TotemCount do
 			if (COE.TotemData[ i ].SpellName == spell) then
 				if (rank) then
@@ -1083,7 +1096,6 @@ function COE_Totem:HookCastSpellByName( SpellName )
 				else
 					rank = COE.TotemData[ i ].MaxRank;
 				end
-
 
 				-- totem found. mark it as pending
 				-- --------------------------------

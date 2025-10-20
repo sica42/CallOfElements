@@ -70,8 +70,10 @@ function COE_Totem:InitMainFrame()
 	this:RegisterEvent( "PLAYER_ENTERING_WORLD" );
 	this:RegisterEvent( "LEARNED_SPELL_IN_TAB" );
 	this:RegisterEvent( "PLAYER_TARGET_CHANGED" );
-	this:RegisterEvent( "PLAYER_AURAS_CHANGED" )
 	this:RegisterEvent( "PLAYER_DEAD" );
+	if not COE.has_superwow then
+		this:RegisterEvent( "PLAYER_AURAS_CHANGED" )
+	end
 
 	this:RegisterEvent( "CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS" );
 	this:RegisterEvent( "CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS" );
@@ -99,6 +101,10 @@ function COE_Totem:OnMainFrameEvent( event )
 		-- -----------------------
 		if (COE_Config:GetSaved( COEOPT_ADVISOR ) == 1) then
 			Chronos.scheduleByName( "COEAdvise", COE.AdvisorInterval, COESched_RunAdvisor );
+		end
+
+		if (COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ) == 1) then
+			Chronos.scheduleByName( "COERecallReminder", COE.RecallReminderInterval, COESched_RunRecallCheck )
 		end
 
 		-- get current element frame coordinates
@@ -827,17 +833,15 @@ function COE_Totem:AdjustDraggedFrames()
 		return;
 	end
 
-	local x, y, k, dx, dy;
-
 	-- get current frame position
 	-- ---------------------------
-	x = this:GetLeft();
-	y = this:GetTop();
+	local x = this:GetLeft();
+	local y = this:GetTop();
 
 	-- get the offset from the old position
 	-- -------------------------------------
-	dx = x - COEFramePositions[ this.Element ].x;
-	dy = y - COEFramePositions[ this.Element ].y;
+	local dx = x - COEFramePositions[ this.Element ].x;
+	local dy = y - COEFramePositions[ this.Element ].y;
 
 	-- adjust all other frames' positions
 	-- -----------------------------------
@@ -865,7 +869,6 @@ end
 	PURPOSE: Stores the current element frame coordinates
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateFrameCoordinates()
-	local k;
 	for k = 1, 4 do
 		local frame = getglobal( "COE" .. COE_Element[ k ] .. "Frame" );
 
@@ -1485,80 +1488,53 @@ function COE_Totem:SetTimerText()
 	end;
 
 	if (COE_Config:GetSaved( COEOPT_ENABLETIMERS ) == 1) then
-		if (COE_Totem:IsTimerActive( this.totem )) then
+		if (COE_Totem:IsTimerActive( this.totem )) or (this.totem.CurCooldown > 0) then
 			-- format text
 			-- ------------
-			local time = COE_Totem:GetTimeLeft( this.totem );
-			local min = math.floor( time / 60 );
-			local sec = mod( math.floor( time ), 60 );
-			local text;
+			local time = COE_Totem:GetTimeLeft( this.totem )
+			local min = math.floor( time / 60 )
+			local sec = mod( math.floor( time ), 60 )
+			local text
 
 			if (min > 0) then
-				text = string.format( "%d:%02d", min, sec );
+				text = string.format( "%d:%02d", min, sec )
 			else
-				text = sec;
+				text = sec
 			end
 
 			-- set text
 			-- ---------
-			timertext:SetText( text );
+			timertext:SetText( text )
 
 			-- set the color
 			-- --------------
-			overlaytex:SetVertexColor( 0.1, 0.1, 0.1, 0.75 );
-			if this.totem.OutOfRange then
-				timertext:SetVertexColor( 1, 0, 0, 1 );
+			overlaytex:SetVertexColor( 0.1, 0.1, 0.1, 0.75 )
+			if (COE.has_superwow and COE_Totem:OutOfRange( "player", this.totem.guid, this.totem.Range * 1.07 )) or ((not COE.has_superwow or not UnitExists( this.totem.guid )) and this.totem.OutOfRange) then
+				timertext:SetVertexColor( 1, 0, 0, 1 )
+				this.totem.OutOfRange = true
 			else
-				timertext:SetVertexColor( 1, 1, 1, 1 );
+				timertext:SetVertexColor( 1, 1, 1, 1 )
+				this.totem.OutOfRange = false
+				COE.RecallReminded = false
 			end
 
 			-- show text and overlay
 			-- ----------------------
-			timertext:Show();
-			overlaytex:Show();
+			timertext:Show()
+			overlaytex:Show()
+		end
 
-
+		if (COE_Totem:IsTimerActive( this.totem )) then
 			-- activate ticks
 			-- --------------
 
 			if (this.totem.ticks == false and this.totem.Tick) then
 				this.totem.ticks = true
-				if not ticktimer:IsVisible() then ticktimer:Show(); end
+				if not ticktimer:IsVisible() then ticktimer:Show() end
 
 				COE_Totem_StartTotemTicks( this:GetName() .. "TickTimer", this:GetName() .. "TickCooldown", this.totem.Tick )
 			end
 		elseif (this.totem.CurCooldown > 0) then
-			-- format text
-			-- ------------
-			local time = COE_Totem:GetCooldownLeft( this.totem );
-			local min = math.floor( time / 60 );
-			local sec = mod( math.floor( time ), 60 );
-			local text;
-
-			if (min > 0) then
-				text = string.format( "%d:%02d", min, sec );
-			else
-				text = sec;
-			end
-
-			-- set text
-			-- ---------
-			timertext:SetText( text );
-
-			-- set the color
-			-- --------------
-			overlaytex:SetVertexColor( 1, 1, 1, 1 );
-			if this.totem.OutOfRange then
-				timertext:SetVertexColor( 1, 0, 0, 1 );
-			else
-				timertext:SetVertexColor( 1, 1, 1, 1 );
-			end
-
-			-- show text and overlay
-			-- ----------------------
-			timertext:Show();
-			overlaytex:Show();
-
 			Chronos.unscheduleByName( this:GetName() .. "TickTimer" );
 			ticktimer:Hide();
 			this.totem.ticks = false;

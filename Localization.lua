@@ -30,6 +30,7 @@ COESTR_NOHEALING = "No healing needed";
 COESTR_HEALING = "Healing %s with %s (Rank %d)";
 COESTR_HEALLOWERRANK = "Not enough mana. Using rank %d instead";
 COESTR_HEALOOM = "Out of mana!";
+COESTR_RECALL = "All totems out of range, consider casting Totemic Recall"
 
 
 -- String patterns
@@ -38,6 +39,7 @@ COESTR_SCANTOTEMS = " Totem";
 COESTR_TOTEMTOOLS = "Tools: (.*) Totem";
 COESTR_TOTEMMANA = "(%d*) Mana";
 COESTR_TOTEMRANK = "Rank (%d)";
+COESTR_TOTEMRANGE = "(%d*)%.?0? ya?r?ds?";
 COESTR_MINUTEDURATION = "(%d%.%d%d) min";
 COESTR_MINUTEDURATION_INT = "(%d) min";
 COESTR_SECDURATION = "(%d%d?) sec";
@@ -105,6 +107,7 @@ COE_ConfigTotemTotemSets = "Totem Sets";
 COE_OptionEnableTotemBar = "Enable Totem Bar";
 COE_OptionHideBackdrop = "Hide background when inactive";
 COE_OptionEnableTimers = "Enable totem timers";
+COE_OptionEnableRecallReminder = "Enable Totemic Recall reminder";
 COE_OptionEnableTimerNotifications = "Enable notifications";
 COE_OptionTTAlignment = "Tooltip Alignment";
 COE_OptionDisplayMode = "Anchor Button";
@@ -145,6 +148,7 @@ COE_ConfigDebuffTab = "Shows the debuff options";
 COE_OptionEnableTotemBar = "Enables and shows the totem bar\nwhich holds all of your available\ntotems for quick use";
 COE_OptionHideBackdrop = "Hides the background when the mouse\nis not above the totem bar";
 COE_OptionEnableTimers = "Enables the display of\nthe remaining totem time\nshown inside the totem button";
+COE_OptionEnableRecallReminder = "Displays a reminder to recall totems when all totems are out of range";
 COE_OptionEnableTimerNotifications = "Displays warnings when a totem\nexpires or is destroyed";
 COE_OptionAdvisor = "Displays notifications when you\nor a member of your party/raid\nhas a debuff that can be cured\nby one of your totems";
 COE_OptionEnableForceSets = "Always replace active totems\nwhen placing a set";

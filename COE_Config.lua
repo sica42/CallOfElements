@@ -58,6 +58,7 @@ COEOPT_TIMERFRAME = 20;
 COEOPT_OVERRIDERANK = 21;
 COEOPT_GROUPBARS = 22;
 COEOPT_FRAMETIMERSONLY = 23;
+COEOPT_ENABLERECALLREMINDER = 24;
 
 COEMODE_ALLTOTEMS = 1;
 COEMODE_TIMERSONLY = 2;
@@ -80,6 +81,7 @@ COE_Config.Defaults = {
 	[ COEOPT_ENABLETOTEMBAR ] = 1,
 	[ COEOPT_HIDEBACKDROP ] = 1,
 	[ COEOPT_ENABLETIMERS ] = 1,
+	[ COEOPT_ENABLERECALLREMINDER ] = 0,
 	[ COEOPT_TIMERNOTIFICATIONS ] = 1,
 	[ COEOPT_TTALIGNMENT ] = 2,
 	[ COEOPT_DISPLAYMODE ] = 1,
@@ -107,6 +109,7 @@ COE_Saved = {
 	[ COEOPT_ENABLETOTEMBAR ] = 1,
 	[ COEOPT_HIDEBACKDROP ] = 1,
 	[ COEOPT_ENABLETIMERS ] = 1,
+	[ COEOPT_ENABLERECALLREMINDER ] = 0,
 	[ COEOPT_TIMERNOTIFICATIONS ] = 1,
 	[ COEOPT_TTALIGNMENT ] = 2,
 	[ COEOPT_DISPLAYMODE ] = 1,
@@ -269,6 +272,7 @@ function COE_Config:OnFrameLoad()
 	-- --------------
 	COE_Config:RegisterOption( COEOPT_ENABLETOTEMBAR, 'check', COEOptionEnableTotemBar, COE_Config:GetSaved( COEOPT_ENABLETOTEMBAR ) );
 	COE_Config:RegisterOption( COEOPT_ENABLETIMERS, 'check', COEOptionEnableTimers, COE_Config:GetSaved( COEOPT_ENABLETIMERS ) );
+	COE_Config:RegisterOption( COEOPT_ENABLERECALLREMINDER, 'check', COEOptionEnableRecallReminder, COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ));
 	COE_Config:RegisterOption( COEOPT_TIMERNOTIFICATIONS, 'check', nil, COE_Config:GetSaved( COEOPT_TIMERNOTIFICATIONS ) );
 	COE_Config:RegisterOption( COEOPT_TTALIGNMENT, 'combo', nil, COE_Config:GetSaved( COEOPT_TTALIGNMENT ), COEOptionTTAlignmentInit );
 	COE_Config:RegisterOption( COEOPT_DISPLAYMODE, 'combo', nil, COE_Config:GetSaved( COEOPT_DISPLAYMODE ), COEOptionDisplayModeInit );
@@ -648,6 +652,21 @@ function COEOptionEnableTimers()
 		if (COE_Config:GetSaved( COEOPT_TIMERFRAME ) == 1) then
 			COETimerFrame:Show();
 		end
+	end
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionEnableRecallReminder
+
+	PURPOSE: Schedules the range check if enabled
+	-------------------------------------------------------------------]]
+function COEOptionEnableRecallReminder()
+	if (COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ) == 1) then
+		if (not Chronos.isScheduledByName( "COERecallReminder" )) then
+			Chronos.scheduleByName( "COERecallReminder", COE.RecallReminderInterval, COESched_RunRecallCheck );
+		end
+	else
+		Chronos.unscheduleByName( "COERecallReminder" );
 	end
 end
 

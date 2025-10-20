@@ -124,6 +124,7 @@ function COE:CreateTotem()
 		SpellName = "",
 		Element = "",
 		Texture = "",
+		Range = 0,
 		ToolPresent = false,
 		Ranks = {},
 		MaxRank = 0,
@@ -280,6 +281,16 @@ function COE:ScanTotems()
 						else
 							COE:Message( COESTR_INVALIDELEMENT .. SpellName );
 						end
+					end
+				end
+
+				-- get range from tooltip
+				-- -----------------------
+				text = COETotemTTTextLeft5
+				if (text and text:GetText()) then
+					local _, _, range = string.find( text:GetText(), COESTR_TOTEMRANGE )
+					if range then
+						totem.Range = tonumber( range ) or 0
 					end
 				end
 
@@ -489,7 +500,7 @@ function COE:GetTotemDurationAndHealth( spellid )
 	-- ===============================================================
 
 	for _, regex in COESTR_TOTEMHEALTH do
-		local _, _, match = string.find(text, regex);
+		local _, _, match = string.find( text, regex );
 		if match then
 			health = tonumber( match ) or 0;
 			break;

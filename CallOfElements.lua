@@ -13,7 +13,7 @@ if (not COE) then
 end
 
 ---@diagnostic disable-next-line: undefined-global
-local has_superwow = SetAutoloot and true or false
+COE[ "has_superwow" ] = SetAutoloot and true or false
 
 COE_VERSION = 2.8
 
@@ -48,6 +48,8 @@ COE[ "ForceUpdate" ] = COE.UpdateInterval * 2;
 COE[ "AdvisorInterval" ] = 1;
 COE[ "AdvisorWarningInterval" ] = 7;
 
+COE[ "RecallReminderInterval" ] = 1;
+
 
 --[[ ----------------------------------------------------------------
 	METHOD: COE:Init
@@ -65,7 +67,7 @@ function COE:Init()
 		COE.Initialized = true;
 		COE:Message( "Call of Elements v" .. COE_VERSION .. " mod CFM /coe" );
 		this:RegisterEvent( "VARIABLES_LOADED" );
-		if has_superwow then
+		if COE.has_superwow then
 			this:RegisterEvent( "UNIT_MODEL_CHANGED" );
 		end
 
