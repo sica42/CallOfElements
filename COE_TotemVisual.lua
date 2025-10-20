@@ -182,7 +182,6 @@ function COE_Totem:ConfigureTotemButtons()
 		return;
 	end
 
-	local i;
 	local buttons = { Earth = 0, Fire = 0, Water = 0, Air = 0 };
 	local indices = { "Earth", "Fire", "Water", "Air" };
 
@@ -1295,6 +1294,11 @@ end
 		the totem for the current totem set if in set config mode
 -------------------------------------------------------------------]]
 function COE_Totem:OnTotemButtonClick()
+	if arg1 == "RightButton" then
+		COE_Totem:DropdownMenu()
+		return
+	end
+
 	if (this.totem == COE.NoTotem) then
 		return;
 	end;
@@ -1555,6 +1559,46 @@ function COE_Totem:SetTimerText()
 		timertext:Hide();
 		overlaytex:Hide();
 	end
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COE_Totem:DropdownMenu
+
+	PURPOSE: Show right click menu
+-------------------------------------------------------------------]]
+function COE_Totem:DropdownMenu()
+	local totem = this.totem;
+	local anchor = this:GetParent().AnchorTotem.totem;
+
+	if not COE_Totem.dropdown_frame then
+		---@class DropdownMenuFrame: Frame
+		COE_Totem.dropdown_frame = CreateFrame( "Frame", "COEDropDownMenu", UIParent, "UIDropDownMenuTemplate" )
+		COE_Totem.dropdown_frame.initialize = COE_Totem.DropdownMenuInitialize
+	end
+
+	if totem == anchor then
+		ToggleDropDownMenu( 1, nil, COE_Totem.dropdown_frame, "cursor", 0, 0 )
+	end
+end
+
+function COE_Totem:DropdownMenuInitialize( level )
+	UIDropDownMenu_AddButton( { isTitle = true, notCheckable = true, text = COEUI_STRINGS.COE_OptionActiveSet } )
+
+	for i = 1, getn( COE_CustomTotemSets ) do
+		UIDropDownMenu_AddButton( { text = COE_CustomTotemSets[ i ].Name, func = COEOptionActiveSetClick, value = COESET_DEFAULT + i } );
+	end
+
+--	UIDropDownMenu_AddButton( { isTitle = true, notCheckable = true, text = "" } )
+	UIDropDownMenu_AddButton( {
+		text = COEUI_STRINGS.COE_DropdownConfig,
+		notCheckable = true,
+		func = function()
+			COE:ToggleConfigFrame()
+		end
+	} )
+
+
+	UIDropDownMenu_SetSelectedValue( COE_Totem.dropdown_frame, COE_Config:GetSaved( COEOPT_ACTIVESET ) );
 end
 
 --[[ =============================================================================================

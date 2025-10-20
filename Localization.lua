@@ -136,6 +136,7 @@ COE_OptionEnableTimerFrame = "Show separate timer frame";
 COE_OptionGroupBars = "Move bars as group";
 COE_OptionOverrideRank = "Rank 1 modifier";
 COE_OptionFrameTimersOnly = "Show timers ONLY in timer frame";
+COE_DropdownConfig = "Configuration";
 }
 
 
