@@ -192,7 +192,8 @@ function COESched_RunAdvisor()
 	-- ----------------------------
 	if (warnTremor and COE.CleansingTotems.Tremor.Totem and
 				(COE.ActiveTotems[ "Earth" ] ~= COE.CleansingTotems.Tremor.Totem or
-					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
+					COE.CleansingTotems.Tremor.Totem.OutOfRange or
+						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
 		if (not COE.CleansingTotems.Tremor.Warn) then
 			COE.CleansingTotems.Tremor.Warn = true;
 			COESched_AdviseTotem( COE.CleansingTotems.Tremor, COESTR_TOTEMTREMOR );
@@ -203,7 +204,8 @@ function COESched_RunAdvisor()
 
 	if (warnDisease and COE.CleansingTotems.Disease.Totem and
 				(COE.ActiveTotems[ "Water" ] ~= COE.CleansingTotems.Disease.Totem or
-					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
+					COE.CleansingTotems.Disease.Totem.OutOfRange or
+						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		if (not COE.CleansingTotems.Disease.Warn) then
 			COE.CleansingTotems.Disease.Warn = true;
 			COESched_AdviseTotem( COE.CleansingTotems.Disease, COESTR_TOTEMDISEASE );
@@ -214,7 +216,8 @@ function COESched_RunAdvisor()
 
 	if (warnPoison and COE.CleansingTotems.Poison.Totem and
 				(COE.ActiveTotems[ "Water" ] ~= COE.CleansingTotems.Poison.Totem or
-					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
+					COE.CleansingTotems.Poison.Totem.OutOfRange or
+						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		if (not COE.CleansingTotems.Poison.Warn) then
 			COE.CleansingTotems.Poison.Warn = true;
 			COESched_AdviseTotem( COE.CleansingTotems.Poison, COESTR_TOTEMPOISON );
@@ -310,15 +313,18 @@ end
 function COE_Totem:ThrowAdvisedTotem()
 	if (COE.CleansingTotems.Tremor.Warn and
 				(COE.ActiveTotems.Earth ~= COE.CleansingTotems.Tremor.Totem or
-					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
+					COE.CleansingTotems.Tremor.Totem.OutOfRange or
+						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Tremor.Totem.SpellName );
 	elseif (COE.CleansingTotems.Disease.Warn and
 				(COE.ActiveTotems.Water ~= COE.CleansingTotems.Disease.Totem or
-					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
+					COE.CleansingTotems.Disease.Totem.OutOfRange or
+						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Disease.Totem.SpellName );
 	elseif (COE.CleansingTotems.Poison.Warn and
 				(COE.ActiveTotems.Water ~= COE.CleansingTotems.Poison.Totem or
-					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
+					COE.CleansingTotems.Poison.Totem.OutOfRange or
+						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Poison.Totem.SpellName );
 	end
 end

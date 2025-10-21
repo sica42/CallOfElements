@@ -34,6 +34,7 @@
 ---@field Tick number?
 ---@field ticks boolean?
 ---@field Warn boolean?
+---@field OutOfRange boolean?
 ---@field guid UnitId?
 
 ---@class TotemPending
