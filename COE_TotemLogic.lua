@@ -70,6 +70,8 @@ end
 
 	PURPOSE: Throws the totem with the specified named id
 -------------------------------------------------------------------]]
+---@param element Element
+---@param id number
 function COE_Totem:ThrowTotem( element, id )
 	if (not COE.Initialized) then
 		return;
@@ -99,6 +101,7 @@ end
 
 	PURPOSE: Returns if the rank 1 modifier is currently pressed
 -------------------------------------------------------------------]]
+---@return boolean
 function COE_Totem:RankModifierDown()
 	local overridekey = COE_Config:GetSaved( COEOPT_OVERRIDERANK );
 
@@ -121,6 +124,8 @@ end
 	PURPOSE: If the totem warning is still active, a notification
 		is displayed and the function rescheduled
 -------------------------------------------------------------------]]
+---@param totem Totem
+---@param msg string
 function COESched_AdviseTotem( totem, msg )
 	if (COE_Config:GetSaved( COEOPT_ADVISOR ) == 1 and totem.Warn) then
 		-- issue warning
@@ -619,6 +624,8 @@ end
 		The pending totem's timer is activated on the next
 		successful SPELLCAST_STOP or removed if it times out first
 -------------------------------------------------------------------]]
+---@param totem Totem?
+---@param rank number?
 function COE_Totem:SetPendingTotem( totem, rank )
 	if (totem) then
 		COE:DebugMessage( "Setting pending totem: " .. totem.SpellName .. " with rank: " .. rank );
@@ -669,6 +676,7 @@ end
 	PURPOSE: Activates the pending totem timer and deactivates a
 		still active timer of the same element
 -------------------------------------------------------------------]]
+---@param totem Totem
 function COE_Totem:ActivatePendingTotem( totem )
 	-- deactivate still active totem of the same element
 	-- --------------------------------------------------
@@ -743,6 +751,7 @@ end
 
 	PURPOSE: Deactivates an active totem timer
 -------------------------------------------------------------------]]
+---@param totem Totem
 function COE_Totem:DeactivateTimer( totem )
 	if (totem and totem.isActive) then
 		COE:DebugMessage( "Deactivating totem: " .. totem.SpellName );
@@ -787,6 +796,7 @@ end
 
 	PURPOSE: Returns if the specified totem timer is active
 -------------------------------------------------------------------]]
+---@param totem Totem
 function COE_Totem:IsTimerActive( totem )
 	if (not totem) then
 		return false;
@@ -801,6 +811,7 @@ end
 
 	PURPOSE: Returns the amount of seconds left on the totem timer
 -------------------------------------------------------------------]]
+---@param totem Totem
 function COE_Totem:GetTimeLeft( totem )
 	if (totem.CurDuration == 0) then
 		return 0;
@@ -814,6 +825,7 @@ end
 
 	PURPOSE: Returns the amount of seconds left on the totem cooldown
 -------------------------------------------------------------------]]
+---@param totem Totem
 function COE_Totem:GetCooldownLeft( totem )
 	if (totem.CurCooldown == 0) then
 		return 0;
@@ -827,6 +839,8 @@ end
 
 	PURPOSE: Issues an expiration warning for the specified totem
 -------------------------------------------------------------------]]
+---@param timemark number
+---@param totem Totem
 function COESched_ExpirationWarning( timemark, totem )
 	if (COE_Config:GetSaved( COEOPT_ENABLETOTEMBAR ) == 1 and
 				COE_Config:GetSaved( COEOPT_ENABLETIMERS ) == 1 and
@@ -853,6 +867,7 @@ end
 	PURPOSE: Stops the cooldown timer of the totem when the
 		cooldown has ended
 -------------------------------------------------------------------]]
+---@param totem Totem
 function COESched_CooldownEnd( totem )
 	Chronos.endTimer( "COECooldown" .. totem.SpellName );
 	totem.CurCooldown = 0;
@@ -974,6 +989,8 @@ end
 	PURPOSE: Setup the totem timer if the action triggered
 		a totem
 -------------------------------------------------------------------]]
+---@param id number
+---@param book any
 function COE_Totem:HookUseAction( id, book )
 	-- use only when timers are enabled
 	-- ---------------------------------
@@ -988,7 +1005,7 @@ function COE_Totem:HookUseAction( id, book )
 	-- check if this triggered a totem
 	-- --------------------------------
 	local text = COETotemTTTextLeft1:GetText();
-	local i, rank, ranktext, trinket;
+	local rank, ranktext, trinket;
 
 	-- Check for Totemic Recall
 	if not isTotemicRecall( text ) then
@@ -1038,6 +1055,8 @@ end
 	PURPOSE: Setup the totem timer if the spell triggered
 		a totem
 -------------------------------------------------------------------]]
+---@param id number
+---@param book any
 function COE_Totem:HookCastSpell( id, book )
 	-- use only when timers are enabled
 	-- ---------------------------------
@@ -1073,6 +1092,7 @@ end
 	PURPOSE: Setup the totem timer if the spell triggered
 		a totem
 -------------------------------------------------------------------]]
+---@param SpellName string
 function COE_Totem:HookCastSpellByName( SpellName )
 	-- use only when timers are enabled
 	-- ---------------------------------
@@ -1116,6 +1136,7 @@ end
 	PURPOSE: Setup the totem timer if the item triggered
 		a totem
 -------------------------------------------------------------------]]
+---@param slotid number
 function COE_Totem:HookUseInventoryItem( slotid )
 	-- use only when timers are enabled
 	-- ---------------------------------

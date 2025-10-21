@@ -10,12 +10,62 @@
 
 ]]
 
+---@class TotemRanks
+---@field SpellID number
+---@field Mana number
+---@field Duration number
+---@field Health number
+---@field Cooldown number
+
+---@class Totem
+---@field SpellName string
+---@field Element string
+---@field Texture string
+---@field Range integer?
+---@field ToolPresent boolean
+---@field Ranks TotemRanks
+---@field MaxRank integer
+---@field isActive boolean
+---@field CurDuration number
+---@field CurHealth number
+---@field CurCooldown number
+---@field isTrinket boolean?
+---@field TrinketSlot number?
+---@field Tick number?
+---@field ticks boolean?
+---@field Warn boolean?
+---@field guid UnitId?
+
+---@class TotemPending
+---@field Totem Totem?
+---@field UseRank number?
+---@field Timeout number
+
+---@alias Element
+---| "Earth"
+---| "Fire"
+---| "Water"
+---| "Air"
+
+---@class SetCycle
+---@field Earth string|nil
+---@field Fire string|nil
+---@field Water string|nil
+---@field Air string|nil
+
+---@class ActiveTotems
+---@field Earth Totem|nil
+---@field Fire Totem|nil
+---@field Water Totem|nil
+---@field Air Totem|nil
+
 --[[ ----------------------------------------------------------------
 	COE.TotemData contains a list of totem classes that are
 	returned by COE:CreateTotem
 	For every available totem the player has, one object is
 	added to this list
 -------------------------------------------------------------------]]
+---@type table<number, Totem>
 COE[ "TotemData" ] = {};
 COE[ "TotemCount" ] = 0;
 
@@ -50,8 +100,11 @@ COE.TotemsAvailable[ "Air" ] = 0;
 	to prevent actions that trigger SPELLCAST_STOP and are not
 	hooked from activating the timer accidentally
 -------------------------------------------------------------------]]
+---@type ActiveTotems
 COE[ "ActiveTotems" ] = { Earth = nil, Fire = nil, Water = nil, Air = nil };
+---@type TotemPending
 COE[ "TotemPending" ] = { Totem = nil, UseRank = 0, Timeout = 0.75 };
+---@type table<Totem, TotemPending>
 COE[ "TotemPendings" ] = {};
 
 
@@ -79,12 +132,14 @@ COE[ "TotemSets" ] = {}
 	COE.SetCycle stores which totem of the active set have
 	already been thrown
 -------------------------------------------------------------------]]
-COE[ "SetCycle" ] = { Earth = false, Fire = false, Water = false, Air = false };
+---@type SetCycle
+COE[ "SetCycle" ] = { Earth = nil, Fire = nil, Water = nil, Air = nil };
 
 
 --[[ ----------------------------------------------------------------
 	COE.NoTotem is a placeholder for an empty anchor button
 -------------------------------------------------------------------]]
+---@type Totem
 COE[ "NoTotem" ] = {
 	SpellName = "",
 	Element = "",
@@ -112,13 +167,12 @@ COE.TotemTicks[ COESTR_TOTEMSTONECLAW ] = 1.5;
 COE.TotemTicks[ COESTR_TOTEMTREMOR ] = 4;
 COE.TotemTicks[ COESTR_TOTEMWINDFURY ] = 10;
 
-
-
 --[[ ----------------------------------------------------------------
 	METHOD: COE:CreateTotem
 
 	PURPOSE: Returns the totem class for a new totem
 -------------------------------------------------------------------]]
+---@return Totem
 function COE:CreateTotem()
 	return {
 		SpellName = "",
@@ -155,6 +209,7 @@ end
 		This is needed for the french version to work. In the
 		english and german versions it just returns the input
 -------------------------------------------------------------------]]
+---@param element Element
 function COE:ElementFromTool( element )
 	if element == COESTR_TOTEMTOOLS_EARTH then
 		return COESTR_ELEMENT_EARTH;
@@ -172,6 +227,8 @@ end
 
 	PURPOSE: Translates a localized element name into english
 -------------------------------------------------------------------]]
+---@param element string
+---@return Element?
 function COE:LocalizedElement( element )
 	if (element == COESTR_ELEMENT_EARTH) then
 		return "Earth";
@@ -275,7 +332,7 @@ function COE:ScanTotems()
 
 						-- valid element?
 						-- ---------------
-						if (COE.TotemsAvailable[ element ] ~= nil) then
+						if (element and COE.TotemsAvailable[ element ] ~= nil) then
 							totem.Element = element;
 							COE.TotemsAvailable[ element ] = COE.TotemsAvailable[ element ] + 1;
 						else
@@ -300,7 +357,7 @@ function COE:ScanTotems()
 
 				-- get totem texture
 				-- ------------------
-				totem.Texture = GetSpellTexture( i, BOOKTYPE_SPELL );
+				totem.Texture = GetSpellTexture( i, BOOKTYPE_SPELL ) or "";
 
 				-- get tool presence
 				-- ------------------
@@ -450,11 +507,8 @@ function COE:GetTotemDurationAndHealth( spellid )
 		return 0, 0, 0;
 	end
 
-	---@type number
 	local duration = 0;
-	---@type number
 	local health = 0;
-	---@type number
 	local cooldown = 0;
 
 	-- ===============================================================
@@ -541,6 +595,8 @@ end
 		This is done by testing the color of the "Tools:" section
 		in the totem tooltip
 -------------------------------------------------------------------]]
+---@param spellid number
+---@return boolean
 function COE:IsToolPresent( spellid )
 	-- get totem tooltip
 	-- ------------------
@@ -572,6 +628,8 @@ end
 
 	RETURNS: equipped, slot
 -------------------------------------------------------------------]]
+---@return boolean isTrinket
+---@return number? slot
 function COE:IsTrinketPresent()
 	for i = 0, 1 do
 		local slot = GetInventorySlotInfo( "Trinket" .. i .. "Slot" );
@@ -608,7 +666,6 @@ function COE:ReorderNewTotems()
 	local used = { Earth = {}, Fire = {}, Water = {}, Air = {} };
 	local bError = false;
 
-	local k;
 	for k = 1, COE.TotemCount do
 		local totem = COE.TotemData[ k ];
 		if (COE_DisplayedTotems[ totem.SpellName ] ~= nil and totem.Element ~= "") then
@@ -756,7 +813,6 @@ end
 	PURPOSE: Fixes errors in the COE_DisplayedTotems array
 -------------------------------------------------------------------]]
 function COE:Fix_DisplayedTotems()
-	local i;
 	local fixed = false;
 	for index, value in pairs( COE_DisplayedTotems ) do
 		-- is this an old-style entry?

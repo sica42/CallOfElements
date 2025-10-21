@@ -241,9 +241,9 @@
 							</CheckButton>
 							<CheckButton name="COE_OptionEnableRecallReminder" inherits="COE_ConfigCheckButtonTemplate" id="24">
 								<Anchors>
-									<Anchor point="TOPRIGHT">
+									<Anchor point="TOPLEFT">
 										<Offset>
-											<AbsDimension x="-150" y="-8"/>
+											<AbsDimension x="158" y="-8"/>
 										</Offset>
 									</Anchor>
 								</Anchors>

@@ -788,6 +788,8 @@ end
 	PURPOSE: Sets the frame parameters responsible for aligning
 		the totem buttons in a specific direction
 -------------------------------------------------------------------]]
+---@param frame table
+---@param direction "Up"|"Down"|"Left"|"Right"
 function COE_Totem:SetFrameDirection( frame, direction )
 	if (direction == "Up") then
 		frame.Direction = direction;
@@ -936,6 +938,7 @@ end
 
 	PURPOSE: Handles UI events for the totem button
 -------------------------------------------------------------------]]
+---@param event Event
 function COE_Totem:OnTotemButtonEvent( event )
 	if (event == "ACTIONBAR_UPDATE_STATE") then
 		if (this.totem) then
@@ -1000,6 +1003,7 @@ end
 
 	PURPOSE: Updates the button state
 -------------------------------------------------------------------]]
+---@param elapsed number
 function COE_Totem:UpdateTotemButton( elapsed )
 	-- check if visual update is necessary
 	-- ------------------------------------
@@ -1197,6 +1201,7 @@ end
 	PURPOSE: Updates the button flash if it has a cleansing totem
 		and the corresponding warning is active
 -------------------------------------------------------------------]]
+---@param elapsed number
 function COE_Totem:UpdateTotemButtonFlash( elapsed )
 	if ((this.totem == COE.NoTotem) or this.totem.isTrinket) then
 		return;
@@ -1438,6 +1443,7 @@ end
 		Customize mode. In Active Set mode, it is also replaces
 		the element totem in the current set
 -------------------------------------------------------------------]]
+---@param button table
 function COE_Totem:MakeAnchorTotem( button )
 	local mode = COE_Config:GetSaved( COEOPT_DISPLAYMODE );
 	local totem = button.totem;
@@ -1581,14 +1587,13 @@ function COE_Totem:DropdownMenu()
 	end
 end
 
-function COE_Totem:DropdownMenuInitialize( level )
+function COE_Totem:DropdownMenuInitialize()
 	UIDropDownMenu_AddButton( { isTitle = true, notCheckable = true, text = COEUI_STRINGS.COE_OptionActiveSet } )
 
 	for i = 1, getn( COE_CustomTotemSets ) do
 		UIDropDownMenu_AddButton( { text = COE_CustomTotemSets[ i ].Name, func = COEOptionActiveSetClick, value = COESET_DEFAULT + i } );
 	end
 
---	UIDropDownMenu_AddButton( { isTitle = true, notCheckable = true, text = "" } )
 	UIDropDownMenu_AddButton( {
 		text = COEUI_STRINGS.COE_DropdownConfig,
 		notCheckable = true,
@@ -1596,7 +1601,6 @@ function COE_Totem:DropdownMenuInitialize( level )
 			COE:ToggleConfigFrame()
 		end
 	} )
-
 
 	UIDropDownMenu_SetSelectedValue( COE_Totem.dropdown_frame, COE_Config:GetSaved( COEOPT_ACTIVESET ) );
 end
@@ -1627,6 +1631,7 @@ end
 
 	PURPOSE: Updates the timer frame
 -------------------------------------------------------------------]]
+---@param elapsed number
 function COE_Totem:UpdateTimerFrame( elapsed )
 	-- check if visual update is necessary
 	-- ------------------------------------
