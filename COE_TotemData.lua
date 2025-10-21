@@ -42,11 +42,23 @@
 ---@field UseRank number?
 ---@field Timeout number
 
----@alias Element
+---@alias TotemElement
 ---| "Earth"
 ---| "Fire"
 ---| "Water"
 ---| "Air"
+
+---@alias TotemBarDirection
+---| "Up"
+---| "Down"
+---| "Left"
+---| "Right"
+
+---@alias TotemBarMode
+---| "Flex"
+---| "Closed"
+---| "Open"
+---| "Hidden"
 
 ---@class SetCycle
 ---@field Earth string|nil
@@ -210,7 +222,7 @@ end
 		This is needed for the french version to work. In the
 		english and german versions it just returns the input
 -------------------------------------------------------------------]]
----@param element Element
+---@param element TotemElement
 function COE:ElementFromTool( element )
 	if element == COESTR_TOTEMTOOLS_EARTH then
 		return COESTR_ELEMENT_EARTH;
@@ -229,7 +241,7 @@ end
 	PURPOSE: Translates a localized element name into english
 -------------------------------------------------------------------]]
 ---@param element string
----@return Element?
+---@return TotemElement?
 function COE:LocalizedElement( element )
 	if (element == COESTR_ELEMENT_EARTH) then
 		return "Earth";

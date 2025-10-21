@@ -233,6 +233,7 @@ COE_DisplayedTotems = {};
 --[[ ----------------------------------------------------------------
 	COE_TotemBars stores the alignment options of the totem bars
 -------------------------------------------------------------------]]
+---@type table<string, COE_TotemBars>
 COE_TotemBars = {
 	Earth = { Direction = "Left", Mode = "Flex", FlexCount = 1 },
 	Fire = { Direction = "Right", Mode = "Flex", FlexCount = 1 },
@@ -954,6 +955,7 @@ function COEOptionFlexCountChange()
 
 	-- set the frame parameters
 	-- -------------------------
+	---@type COE_Totem
 	local frame = getglobal( "COE" .. element .. "Frame" );
 	frame.FlexCount = COE_TotemBars[ element ].FlexCount;
 	COE_Totem:Invalidate( frame, false, true, true );

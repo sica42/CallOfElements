@@ -10,14 +10,101 @@
 
 ]]
 
-if (not COE_Totem) then
-	COE_Totem = {};
-end
+---@class Updates
+---@field Anchor boolean
+---@field Static boolean
+---@field Dynamic boolean
 
----@param unit1 UnitId
----@param unit2 UnitId
----@param distance number
----@return boolean OutOfRange
+---@class COE_TotemBars
+---@field Direction TotemBarDirection
+---@field Mode TotemBarMode
+---@field FlexCount number
+
+---@class COE_Totem: CheckButton, COE_TotemBars
+---@field totem Totem
+---@field Updates Updates
+---@field Point string
+---@field RelPoint string
+---@field XSpacing integer
+---@field YSpacing integer
+---@field FlexTime number
+---@field IsMoving boolean
+---@field TimerHooks table
+---@field AdvisorTime number
+---@field UpdateTime number
+---@field Flashtime number
+---@field Reconfigure boolean
+---@field Element TotemElement
+---@field isMoving boolean
+---@field MouseHover boolean
+---@field Expanded boolean
+---@field AnchorTotem COE_Totem
+---@field ElementFrame COE_Totem
+---@field DropdownFrame Frame
+---@field DropdownMenu fun( self: COE_Totem )
+---@field DropdownMenuInitialize fun( self: COE_Totem )
+---@field SetFrameDirection fun( self: COE_Totem, frame: COE_Totem, direction: TotemBarDirection )
+---@field InitFrame fun( self: COE_Totem )
+---@field InitMainFrame fun( self: COE_Totem )
+---@field InitTimerFrame fun( self: COE_Totem )
+---@field OnFrameEvent fun( self: COE_Totem, event: Event )
+---@field OnTotemButtonLoad fun( self: COE_Totem )
+---@field OnTotemButtonEvent fun( self: COE_Totem, event: Event )
+---@field OnEnterTotemButton fun( self: COE_Totem )
+---@field OnLeaveTotemButton fun( self: COE_Totem )
+---@field OnTotemButtonClick fun( self: COE_Totem )
+---@field ButtonStartDrag fun( self: COE_Totem )
+---@field ButtonStopDrag fun( self: COE_Totem )
+---@field OnMainFrameEvent fun( self: COE_Totem, event: Event )
+---@field ResetFrames fun( self: COE_Totem )
+---@field AdjustDraggedFrames fun( self: COE_Totem )
+---@field ConfigureTotemButtons fun( self: COE_Totem )
+---@field Invalidate fun( self: COE_Totem, frame: COE_Totem, Anchor: boolean, Static: boolean, Dynamic: boolean )
+---@field GetSetIndex fun( self: COE_Totem, name: string ): number?, boolean?
+---@field SwitchToSet fun( self: COE_Totem, name: string )
+---@field SwitchNamedSet fun( self: COE_Totem ): boolean
+---@field SwitchPVPSet fun( self: COE_Totem )
+---@field SwitchToNextSet fun( self: COE_Totem )
+---@field SwitchToPriorSet fun( self: COE_Totem )
+---@field SetPendingTotem fun(self: COE_Totem, totem: Totem?, rank: number? )
+---@field SetTimerText fun( self: COE_Totem )
+---@field ActivatePendingTotem fun( self: COE_Totem, totem: Totem )
+---@field ThrowSet fun( self: COE_Totem, set: string, forces: boolean )
+---@field ThrowAdvisedTotem fun( self: COE_Totem )
+---@field ThrowTotem fun(self: COE_Totem, element: TotemElement, id: number )
+---@field MakeAnchorTotem fun(self: COE_Totem, button: table )
+---@field RankModifierDown fun( self: COE_Totem ): boolean
+---@field ResetSetCycle fun( self: COE_Totem )
+---@field ResetTimers fun( self: COE_Totem )
+---@field DeactivateTimer fun( self: COE_Totem, totem: Totem )
+---@field Rescan fun( self: COE_Totem )
+---@field ScanTargetForDebuff fun( self: COE_Totem, target: UnitId ): boolean, boolean, boolean
+---@field OutOfRange fun( self: COE_Totem, unit1: UnitId, unit2: UnitId, distance: number ): boolean
+---@field GetTimeLeft fun( self: COE_Totem, totem: Totem ): number
+---@field GetCooldownLeft fun( self: COE_Totem, totem: Totem ): number
+---@field IsAdvisedTotem fun( self: COE_Totem, totem: Totem ): boolean
+---@field IsTimerActive fun( self: COE_Totem, totem: Totem ): boolean
+---@field TotemDamage fun( self: COE_Totem )
+---@field SetupTimerHooks fun( self: COE_Totem )
+---@field HookUseAction fun( self: COE_Totem, id: number )
+---@field HookCastSpell fun( self: COE_Totem, id: number )
+---@field HookCastSpellByName fun( self: COE_Totem, SpellName: string )
+---@field HookUseInventoryItem fun( self: COE_Totem, slotid: number )
+---@field UpdateAllFrames fun( self: COE_Totem )
+---@field UpdateFrame fun( self: COE_Totem, elapsed: number )
+---@field UpdateFrameCoordinates fun( self: COE_Totem )
+---@field UpdateAnchorButton fun( self: COE_Totem )
+---@field UpdateStatic fun( self: COE_Totem )
+---@field UpdateDynamic fun( self: COE_Totem )
+---@field UpdateTotemButton fun( self: COE_Totem, elapsed: number )
+---@field UpdateTotemButtonCooldown fun( self: COE_Totem )
+---@field UpdateTotemButtonIsUsable fun( self: COE_Totem )
+---@field UpdateTotemButtonHotKey fun( self: COE_Totem )
+---@field UpdateTotemButtonFlash fun( self: COE_Totem, elapsed: number )
+---@field UpdateTimerFrame fun( self: COE_Totem, elapsed: number )
+COE_Totem = COE_Totem or {}
+local COE_Totem = COE_Totem
+
 function COE_Totem:OutOfRange( unit1, unit2, distance )
 	if not (COE.has_superwow and UnitExists( unit1 ) and UnitExists( unit2 ) and UnitCanAssist( unit1, unit2 )) then
 		return false
@@ -70,8 +157,6 @@ end
 
 	PURPOSE: Throws the totem with the specified named id
 -------------------------------------------------------------------]]
----@param element Element
----@param id number
 function COE_Totem:ThrowTotem( element, id )
 	if (not COE.Initialized) then
 		return;
@@ -193,7 +278,7 @@ function COESched_RunAdvisor()
 	if (warnTremor and COE.CleansingTotems.Tremor.Totem and
 				(COE.ActiveTotems[ "Earth" ] ~= COE.CleansingTotems.Tremor.Totem or
 					COE.CleansingTotems.Tremor.Totem.OutOfRange or
-						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
+					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
 		if (not COE.CleansingTotems.Tremor.Warn) then
 			COE.CleansingTotems.Tremor.Warn = true;
 			COESched_AdviseTotem( COE.CleansingTotems.Tremor, COESTR_TOTEMTREMOR );
@@ -205,7 +290,7 @@ function COESched_RunAdvisor()
 	if (warnDisease and COE.CleansingTotems.Disease.Totem and
 				(COE.ActiveTotems[ "Water" ] ~= COE.CleansingTotems.Disease.Totem or
 					COE.CleansingTotems.Disease.Totem.OutOfRange or
-						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
+					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		if (not COE.CleansingTotems.Disease.Warn) then
 			COE.CleansingTotems.Disease.Warn = true;
 			COESched_AdviseTotem( COE.CleansingTotems.Disease, COESTR_TOTEMDISEASE );
@@ -217,7 +302,7 @@ function COESched_RunAdvisor()
 	if (warnPoison and COE.CleansingTotems.Poison.Totem and
 				(COE.ActiveTotems[ "Water" ] ~= COE.CleansingTotems.Poison.Totem or
 					COE.CleansingTotems.Poison.Totem.OutOfRange or
-						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
+					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		if (not COE.CleansingTotems.Poison.Warn) then
 			COE.CleansingTotems.Poison.Warn = true;
 			COESched_AdviseTotem( COE.CleansingTotems.Poison, COESTR_TOTEMPOISON );
@@ -314,17 +399,17 @@ function COE_Totem:ThrowAdvisedTotem()
 	if (COE.CleansingTotems.Tremor.Warn and
 				(COE.ActiveTotems.Earth ~= COE.CleansingTotems.Tremor.Totem or
 					COE.CleansingTotems.Tremor.Totem.OutOfRange or
-						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
+					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Tremor.Totem.SpellName );
 	elseif (COE.CleansingTotems.Disease.Warn and
 				(COE.ActiveTotems.Water ~= COE.CleansingTotems.Disease.Totem or
 					COE.CleansingTotems.Disease.Totem.OutOfRange or
-						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
+					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Disease.Totem.SpellName );
 	elseif (COE.CleansingTotems.Poison.Warn and
 				(COE.ActiveTotems.Water ~= COE.CleansingTotems.Poison.Totem or
 					COE.CleansingTotems.Poison.Totem.OutOfRange or
-						not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
+					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Poison.Totem.SpellName );
 	end
 end
@@ -572,7 +657,8 @@ function COE_Totem:ThrowSet( set, forced )
 			local totemData = COE.TotemSets[ activeset ][ element ];
 			local activeTotem = COE.ActiveTotems[ element ]
 
-			local isOutOfRange = COE_Config:GetSaved( COEOPT_ENABLEDISTANCECHECK ) == 1 and activeTotem and activeTotem.guid and COE_Totem:OutOfRange( "player", activeTotem.guid, 20 )
+			local isOutOfRange = COE_Config:GetSaved( COEOPT_ENABLEDISTANCECHECK ) == 1 and activeTotem and activeTotem.guid and
+			COE_Totem:OutOfRange( "player", activeTotem.guid, 20 )
 			local isForcedUpdate = forced
 			local isDifferentTotem = activeTotem ~= totemData
 			local isInactiveTotem = activeTotem and not activeTotem.isActive
@@ -630,8 +716,6 @@ end
 		The pending totem's timer is activated on the next
 		successful SPELLCAST_STOP or removed if it times out first
 -------------------------------------------------------------------]]
----@param totem Totem?
----@param rank number?
 function COE_Totem:SetPendingTotem( totem, rank )
 	if (totem) then
 		COE:DebugMessage( "Setting pending totem: " .. totem.SpellName .. " with rank: " .. rank );
@@ -682,7 +766,6 @@ end
 	PURPOSE: Activates the pending totem timer and deactivates a
 		still active timer of the same element
 -------------------------------------------------------------------]]
----@param totem Totem
 function COE_Totem:ActivatePendingTotem( totem )
 	-- deactivate still active totem of the same element
 	-- --------------------------------------------------
@@ -757,7 +840,6 @@ end
 
 	PURPOSE: Deactivates an active totem timer
 -------------------------------------------------------------------]]
----@param totem Totem
 function COE_Totem:DeactivateTimer( totem )
 	if (totem and totem.isActive) then
 		COE:DebugMessage( "Deactivating totem: " .. totem.SpellName );
@@ -802,7 +884,6 @@ end
 
 	PURPOSE: Returns if the specified totem timer is active
 -------------------------------------------------------------------]]
----@param totem Totem
 function COE_Totem:IsTimerActive( totem )
 	if (not totem) then
 		return false;
@@ -817,7 +898,6 @@ end
 
 	PURPOSE: Returns the amount of seconds left on the totem timer
 -------------------------------------------------------------------]]
----@param totem Totem
 function COE_Totem:GetTimeLeft( totem )
 	if (totem.CurDuration == 0) then
 		return 0;
@@ -831,7 +911,6 @@ end
 
 	PURPOSE: Returns the amount of seconds left on the totem cooldown
 -------------------------------------------------------------------]]
----@param totem Totem
 function COE_Totem:GetCooldownLeft( totem )
 	if (totem.CurCooldown == 0) then
 		return 0;
@@ -887,7 +966,7 @@ end
 -------------------------------------------------------------------]]
 function COE_Totem:TotemDamage()
 	for _, regex in COESTR_TOTEMDAMAGE do
-		local _, _, spellName, dmg = string.find(arg1, regex);
+		local _, _, spellName, dmg = string.find( arg1, regex );
 		if (spellName and dmg) then
 			-- find totem
 			-- -----------
@@ -955,13 +1034,13 @@ end
 function COE_Totem:SetupTimerHooks()
 	COE_Totem.TimerHooks[ "UseAction" ] = UseAction;
 	UseAction = function( id, book, onself )
-		COE_Totem:HookUseAction( id, book );
+		COE_Totem:HookUseAction( id );
 		COE_Totem.TimerHooks[ "UseAction" ]( id, book, onself );
 	end;
 
 	COE_Totem.TimerHooks[ "CastSpell" ] = CastSpell;
 	CastSpell = function( id, book )
-		COE_Totem:HookCastSpell( id, book );
+		COE_Totem:HookCastSpell( id );
 		COE_Totem.TimerHooks[ "CastSpell" ]( id, book );
 	end;
 
@@ -995,9 +1074,7 @@ end
 	PURPOSE: Setup the totem timer if the action triggered
 		a totem
 -------------------------------------------------------------------]]
----@param id number
----@param book any
-function COE_Totem:HookUseAction( id, book )
+function COE_Totem:HookUseAction( id )
 	-- use only when timers are enabled
 	-- ---------------------------------
 	if (COE_Config:GetSaved( COEOPT_ENABLETIMERS ) == 0) then
@@ -1061,9 +1138,7 @@ end
 	PURPOSE: Setup the totem timer if the spell triggered
 		a totem
 -------------------------------------------------------------------]]
----@param id number
----@param book any
-function COE_Totem:HookCastSpell( id, book )
+function COE_Totem:HookCastSpell( id )
 	-- use only when timers are enabled
 	-- ---------------------------------
 	if (COE_Config:GetSaved( COEOPT_ENABLETIMERS ) == 0) then
@@ -1098,7 +1173,6 @@ end
 	PURPOSE: Setup the totem timer if the spell triggered
 		a totem
 -------------------------------------------------------------------]]
----@param SpellName string
 function COE_Totem:HookCastSpellByName( SpellName )
 	-- use only when timers are enabled
 	-- ---------------------------------
@@ -1142,7 +1216,6 @@ end
 	PURPOSE: Setup the totem timer if the item triggered
 		a totem
 -------------------------------------------------------------------]]
----@param slotid number
 function COE_Totem:HookUseInventoryItem( slotid )
 	-- use only when timers are enabled
 	-- ---------------------------------

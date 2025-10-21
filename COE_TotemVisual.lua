@@ -10,9 +10,9 @@
 
 ]]
 
-if (not COE_Totem) then
-	COE_Totem = {};
-end
+---@type COE_Totem
+COE_Totem = COE_Totem or {}
+local COE_Totem = COE_Totem
 
 COEUI_BUTTONGAP = 4;
 
@@ -50,6 +50,8 @@ COEDynamic = { n = 7, nil, nil, nil, nil, nil, nil, nil };
 	PURPOSE: Initializes the totem module and registers events
 -------------------------------------------------------------------]]
 function COE_Totem:InitMainFrame()
+	local this = this --[[@as COE_Totem]]
+
 	-- addon loaded?
 	-- --------------
 	if (not COE.Initialized) then
@@ -396,6 +398,8 @@ end
 	PURPOSE: Initializes the element frame
 -------------------------------------------------------------------]]
 function COE_Totem:InitFrame()
+	local this = this --[[@as COE_Totem]]
+
 	-- addon loaded?
 	-- --------------
 	if (not COE.Initialized) then
@@ -425,6 +429,8 @@ end
 	PURPOSE: Handles UI events
 -------------------------------------------------------------------]]
 function COE_Totem:OnFrameEvent( event )
+	local this = this --[[@as COE_Totem]]
+
 	if (event == "PLAYER_ENTERING_WORLD") then
 		-- load frame settings from saved variables
 		-- -----------------------------------------
@@ -438,7 +444,7 @@ function COE_Totem:OnFrameEvent( event )
 		-- load saved position
 		if (COEFramePositions[ this.Element ].x ~= 0 and COEFramePositions[ this.Element ].y ~= 0) then
 			this:ClearAllPoints();
-			this:SetPoint( "TOPLEFT", UIParent, "BOTTOMLEFT", COEFramePositions[ this.Element ].x, COEFramePositions[ this.Element ].y );
+			this:SetPoint( "TopLeft", UIParent, "BottomLeft", COEFramePositions[ this.Element ].x, COEFramePositions[ this.Element ].y );
 		end
 		-- invalidate part
 		COE_Totem:Invalidate( this, true, true, true );
@@ -475,6 +481,8 @@ end
 	PURPOSE: Configures the totem buttons and adjusts the frame size
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateFrame( elapsed )
+	local this = this --[[@as COE_Totem]]
+
 	-- check if visual update is necessary
 	-- ------------------------------------
 	this.UpdateTime = this.UpdateTime + elapsed;
@@ -494,7 +502,7 @@ function COE_Totem:UpdateFrame( elapsed )
 
 	-- set scaling
 	-- ------------
-	this:SetScale( COE_Config:GetSaved( COEOPT_SCALING ) );
+	this:SetScale( tonumber( COE_Config:GetSaved( COEOPT_SCALING ) ) or 1 );
 
 	-- invalidate all if moving
 	-- -------------------------
@@ -557,6 +565,7 @@ end
 		display and bar mode
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateAnchorButton()
+	local this = this --[[@as COE_Totem]]
 	local mode = COE_Config:GetSaved( COEOPT_DISPLAYMODE );
 	local activeset = COE_Config:GetSaved( COEOPT_ACTIVESET );
 
@@ -584,7 +593,7 @@ function COE_Totem:UpdateAnchorButton()
 
 	this.AnchorTotem:SetScale( 1 );
 	this.AnchorTotem:ClearAllPoints();
-	this.AnchorTotem:SetPoint( "TOPLEFT", this, "TOPLEFT" );
+	this.AnchorTotem:SetPoint( "TopLeft", this, "TopLeft" );
 end
 
 --[[ ----------------------------------------------------------------
@@ -593,6 +602,7 @@ end
 	PURPOSE: Shows the FlexiCount first totems of this element
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateStatic()
+	local this = this --[[@as COE_Totem]]
 	local inConfig = COE.ConfigureBarMode or COE.ConfigureOrderMode or COE.ConfigureSetsMode;
 
 	if (this.Mode == "Closed" and not COE.ConfigureBarMode and
@@ -645,6 +655,7 @@ end
 		the	frame is expanded
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateDynamic()
+	local this = this --[[@as COE_Totem]]
 	-- no dynamic buttons in configuration
 	-- ------------------------------------
 	if (COE.ConfigureBarMode or COE.ConfigureOrderMode or COE.ConfigureSetsMode) then
@@ -652,7 +663,7 @@ function COE_Totem:UpdateDynamic()
 	end
 
 	if (this.Mode == "Flex") then
-		local i, start, lastvisible, idx;
+		local start, lastvisible, idx;
 		idx = 1;
 
 		if (this.AnchorTotem.totem == COE.NoTotem) then
@@ -728,7 +739,7 @@ function COE_Totem:UpdateDynamic()
 			COEDynamic[ i ] = nil;
 		end
 	elseif (this.Mode == "Closed") then
-		local i, start, lastvisible;
+		local start, lastvisible;
 		lastvisible = this.AnchorTotem;
 
 		if (this.AnchorTotem.totem == COE.NoTotem) then
@@ -788,8 +799,6 @@ end
 	PURPOSE: Sets the frame parameters responsible for aligning
 		the totem buttons in a specific direction
 -------------------------------------------------------------------]]
----@param frame table
----@param direction "Up"|"Down"|"Left"|"Right"
 function COE_Totem:SetFrameDirection( frame, direction )
 	if (direction == "Up") then
 		frame.Direction = direction;
@@ -905,6 +914,8 @@ end
 	PURPOSE: Registers events for the totem button
 -------------------------------------------------------------------]]
 function COE_Totem:OnTotemButtonLoad()
+	local this = this --[[@as COE_Totem]]
+
 	if (not COE.Initialized) then
 		return;
 	end
@@ -913,7 +924,7 @@ function COE_Totem:OnTotemButtonLoad()
 	-- ----------------
 	this.UpdateTime = 0;
 	this.Flashtime = 0;
-	this.ElementFrame = this:GetParent();
+	this.ElementFrame = this:GetParent() --[[@as COE_Totem]]
 
 	getglobal( this:GetName() .. "TickCooldown" ):SetFrameLevel( getglobal( this:GetName() .. "TickCooldown" ):GetFrameLevel() - 1 )
 
@@ -938,8 +949,9 @@ end
 
 	PURPOSE: Handles UI events for the totem button
 -------------------------------------------------------------------]]
----@param event Event
 function COE_Totem:OnTotemButtonEvent( event )
+	local this = this --[[@as COE_Totem]]
+
 	if (event == "ACTIONBAR_UPDATE_STATE") then
 		if (this.totem) then
 			COE_Totem:UpdateTotemButton( COE.ForceUpdate );
@@ -1003,8 +1015,9 @@ end
 
 	PURPOSE: Updates the button state
 -------------------------------------------------------------------]]
----@param elapsed number
 function COE_Totem:UpdateTotemButton( elapsed )
+	local this = this --[[@as COE_Totem]]
+
 	-- check if visual update is necessary
 	-- ------------------------------------
 	this.UpdateTime = this.UpdateTime + elapsed;
@@ -1087,6 +1100,8 @@ end
 	PURPOSE: Updates the cooldown texture of the button
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateTotemButtonCooldown()
+	local this = this --[[@as COE_Totem]]
+
 	if (this.totem == COE.NoTotem) then
 		return;
 	end;
@@ -1126,6 +1141,8 @@ end
 		know if the totem is usable or if we have enough mana
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateTotemButtonIsUsable()
+	local this = this --[[@as COE_Totem]]
+
 	if (this.totem == COE.NoTotem) then
 		return;
 	end;
@@ -1168,6 +1185,8 @@ end
 	PURPOSE: Updates the hot key display
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateTotemButtonHotKey()
+	local this = this --[[@as COE_Totem]]
+
 	if (this.totem == COE.NoTotem) then
 		return;
 	end;
@@ -1201,8 +1220,9 @@ end
 	PURPOSE: Updates the button flash if it has a cleansing totem
 		and the corresponding warning is active
 -------------------------------------------------------------------]]
----@param elapsed number
 function COE_Totem:UpdateTotemButtonFlash( elapsed )
+	local this = this --[[@as COE_Totem]]
+
 	if ((this.totem == COE.NoTotem) or this.totem.isTrinket) then
 		return;
 	end;
@@ -1241,6 +1261,8 @@ end
 		parent frame if in flex mode
 -------------------------------------------------------------------]]
 function COE_Totem:OnEnterTotemButton()
+	local this = this --[[@as COE_Totem]]
+
 	-- show tooltip if enabled
 	-- ------------------------
 	if (COEUI_TTALIGN[ COE_Config:GetSaved( COEOPT_TTALIGNMENT ) ][ 1 ] ~= "DISABLED" and
@@ -1279,6 +1301,8 @@ end
 	PURPOSE: Hides the tooltip
 -------------------------------------------------------------------]]
 function COE_Totem:OnLeaveTotemButton()
+	local this = this --[[@as COE_Totem]]
+
 	-- hide tooltip if enabled
 	-- ------------------------
 	if (COEUI_TTALIGN[ COE_Config:GetSaved( COEOPT_TTALIGNMENT ) ][ 1 ] ~= "DISABLED") then
@@ -1299,6 +1323,8 @@ end
 		the totem for the current totem set if in set config mode
 -------------------------------------------------------------------]]
 function COE_Totem:OnTotemButtonClick()
+	local this = this --[[@as COE_Totem]]
+
 	if arg1 == "RightButton" then
 		COE_Totem:DropdownMenu()
 		return
@@ -1398,8 +1424,11 @@ end
 	PURPOSE: Starts dragging of all or one parent frames
 -------------------------------------------------------------------]]
 function COE_Totem:ButtonStartDrag()
-	if (this:GetParent() == COETimerFrame) then
-		this:GetParent():StartMoving();
+	local this = this --[[@as COE_Totem]]
+	local parent = this:GetParent() --[[@as COE_Totem]]
+
+	if (parent == COETimerFrame) then
+		parent:StartMoving();
 
 		-- When the Shift key is held, pickup the spell instead.
 		-- Additionally holding the control key while doing so
@@ -1416,8 +1445,8 @@ function COE_Totem:ButtonStartDrag()
 		local SpellID = this.totem.Ranks[ rank ].SpellID;
 		PickupSpell( SpellID, BOOKTYPE_SPELL );
 	elseif (COE_Config:GetSaved( COEOPT_FIXBAR ) == 0 and this == this.ElementFrame.AnchorTotem) then
-		this:GetParent():StartMoving();
-		this:GetParent().IsMoving = true;
+		parent:StartMoving();
+		parent.IsMoving = true;
 	end
 end
 
@@ -1427,10 +1456,11 @@ end
 	PURPOSE: Stops dragging of all or one parent frames
 -------------------------------------------------------------------]]
 function COE_Totem:ButtonStopDrag()
-	this:GetParent():StopMovingOrSizing();
+	local parent = this:GetParent() --[[@as COE_Totem]]
+	parent:StopMovingOrSizing();
 
-	if (this:GetParent() ~= COETimerFrame) then
-		this:GetParent().IsMoving = false;
+	if (parent ~= COETimerFrame) then
+		parent.IsMoving = false;
 		COE_Totem:UpdateFrameCoordinates();
 	end
 end
@@ -1443,7 +1473,6 @@ end
 		Customize mode. In Active Set mode, it is also replaces
 		the element totem in the current set
 -------------------------------------------------------------------]]
----@param button table
 function COE_Totem:MakeAnchorTotem( button )
 	local mode = COE_Config:GetSaved( COEOPT_DISPLAYMODE );
 	local totem = button.totem;
@@ -1480,6 +1509,8 @@ end;
 		associated totem has an active timer
 -------------------------------------------------------------------]]
 function COE_Totem:SetTimerText()
+	local this = this --[[@as COE_Totem]]
+
 	if (this.totem == COE.NoTotem) then
 		return;
 	end;
@@ -1574,16 +1605,17 @@ end
 -------------------------------------------------------------------]]
 function COE_Totem:DropdownMenu()
 	local totem = this.totem;
-	local anchor = this:GetParent().AnchorTotem.totem;
+	local parent = this:GetParent() --[[@as COE_Totem]]
+	local anchor = parent.AnchorTotem.totem;
 
-	if not COE_Totem.dropdown_frame then
+	if not COE_Totem.DropdownFrame then
 		---@class DropdownMenuFrame: Frame
-		COE_Totem.dropdown_frame = CreateFrame( "Frame", "COEDropDownMenu", UIParent, "UIDropDownMenuTemplate" )
-		COE_Totem.dropdown_frame.initialize = COE_Totem.DropdownMenuInitialize
+		COE_Totem.DropdownFrame = CreateFrame( "Frame", "COEDropDownMenu", UIParent, "UIDropDownMenuTemplate" )
+		COE_Totem.DropdownFrame.initialize = COE_Totem.DropdownMenuInitialize
 	end
 
 	if totem == anchor then
-		ToggleDropDownMenu( 1, nil, COE_Totem.dropdown_frame, "cursor", 0, 0 )
+		ToggleDropDownMenu( 1, nil, COE_Totem.DropdownFrame, "cursor", 0, 0 )
 	end
 end
 
@@ -1602,7 +1634,7 @@ function COE_Totem:DropdownMenuInitialize()
 		end
 	} )
 
-	UIDropDownMenu_SetSelectedValue( COE_Totem.dropdown_frame, COE_Config:GetSaved( COEOPT_ACTIVESET ) );
+	UIDropDownMenu_SetSelectedValue( COE_Totem.DropdownFrame, COE_Config:GetSaved( COEOPT_ACTIVESET ) );
 end
 
 --[[ =============================================================================================
@@ -1631,7 +1663,6 @@ end
 
 	PURPOSE: Updates the timer frame
 -------------------------------------------------------------------]]
----@param elapsed number
 function COE_Totem:UpdateTimerFrame( elapsed )
 	-- check if visual update is necessary
 	-- ------------------------------------
@@ -1642,7 +1673,7 @@ function COE_Totem:UpdateTimerFrame( elapsed )
 
 	-- set scaling
 	-- ------------
-	this:SetScale( COE_Config:GetSaved( COEOPT_SCALING ) );
+	this:SetScale( tonumber( COE_Config:GetSaved( COEOPT_SCALING ) ) or 1 );
 
 	local lastbutton = nil;
 	local count = 0;
