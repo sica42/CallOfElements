@@ -47,6 +47,9 @@
 ---@field InitFrame fun( self: COE_Totem )
 ---@field InitMainFrame fun( self: COE_Totem )
 ---@field InitTimerFrame fun( self: COE_Totem )
+---@field InitTotemicRecall fun( self: COE_Totem )
+---@field UpdateTotemicRecall fun( self: COE_Totem, elapsed: number )
+---@field CastTotemicRecall fun( self: COE_Totem )
 ---@field OnFrameEvent fun( self: COE_Totem, event: Event )
 ---@field OnTotemButtonLoad fun( self: COE_Totem )
 ---@field OnTotemButtonEvent fun( self: COE_Totem, event: Event )
@@ -1008,7 +1011,6 @@ end
 	PURPOSE: Resets all active timers to zero
 -------------------------------------------------------------------]]
 function COE_Totem:ResetTimers()
-	local k;
 	for k = 1, 4 do
 		if (COE.ActiveTotems[ COE_Element[ k ] ]) then
 			COE_Totem:DeactivateTimer( COE.ActiveTotems[ COE_Element[ k ] ] );

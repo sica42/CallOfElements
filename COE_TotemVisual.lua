@@ -23,7 +23,8 @@ if (not COEFramePositions) then
 		Earth = { x = 0, y = 0 },
 		Fire = { x = 0, y = 0 },
 		Water = { x = 0, y = 0 },
-		Air = { x = 0, y = 0 }
+		Air = { x = 0, y = 0 },
+		TotemicRecall = { x = 0, y = 0 }
 	};
 end
 
@@ -305,6 +306,124 @@ function COE_Totem:ConfigureTotemButtons()
 end
 
 --[[ ----------------------------------------------------------------
+	METHOD: COE_Totem:InitTotemicRecall
+
+	PURPOSE: Initialize the Totemic Recall button
+-------------------------------------------------------------------]]
+function COE_Totem:InitTotemicRecall()
+	---@class Frame
+	local RecallFrame = getglobal( "COETotemicRecallFrame" )
+	if RecallFrame.Element then return end
+
+	RecallFrame.Element = "TotemicRecall"
+	RecallFrame.Updates = {}
+	RecallFrame.UpdateTime = 0
+	RecallFrame:SetScript( "OnUpdate", function()
+		COE_Totem:UpdateTotemicRecall( arg1 )
+	end )
+
+	---@class CheckButton
+	local RecallButton = getglobal( "COETotemicRecall" )
+	local spellIndex = RecallButton[ "spellIndex" ]
+
+	RecallButton:RegisterForDrag( "LeftButton" )
+	RecallButton:RegisterForClicks( "LeftButtonUp", "RightButtonUp" )
+	RecallButton:RegisterEvent( "ACTIONBAR_UPDATE_COOLDOWN" )
+
+	local texture = GetSpellTexture( spellIndex, BOOKTYPE_SPELL )
+	getglobal( "COETotemicRecallIcon" ):SetTexture( texture )
+
+	RecallButton:SetScript( "OnDragStart", function()
+		RecallFrame:StartMoving()
+		RecallFrame.IsMoving = true
+	end )
+
+	RecallButton:SetScript( "OnDragStop", function()
+		RecallFrame.IsMoving = false
+		RecallFrame:StopMovingOrSizing()
+		COE_Totem:UpdateFrameCoordinates()
+	end )
+
+	RecallButton:SetScript( "OnEnter", function()
+		GameTooltip:SetOwner( this, COEUI_TTALIGN[ COE_Config:GetSaved( COEOPT_TTALIGNMENT ) ][ 1 ] )
+		GameTooltip:SetSpell( spellIndex, BOOKTYPE_SPELL )
+		GameTooltip:Show()
+	end )
+
+	RecallButton:SetScript( "OnLeave", function()
+		GameTooltip:Hide()
+	end )
+
+	RecallButton:SetScript( "OnClick", function()
+		this:SetChecked( false )
+		if arg1 == "RightButton" then
+			COE_Totem:DropdownMenu()
+			return
+		end
+		COE_Totem:CastTotemicRecall()
+	end )
+
+	RecallButton:SetScript( "OnEvent", function()
+		if event == "ACTIONBAR_UPDATE_COOLDOWN" then
+			local start, duration, enable = GetSpellCooldown( spellIndex, "BOOKTYPE_SPELL" )
+			if duration > 2 then
+				CooldownFrame_SetTimer( getglobal( this:GetName() .. "Cooldown" ), start, duration, enable )
+				RecallFrame.cooldownEnd = GetTime() + duration
+			end
+		end
+	end )
+
+	COE_Totem:UpdateTotemicRecall( COE[ "ForceUpdate" ] )
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COE_Totem:UpdateTotemicRecall
+
+	PURPOSE: Updates the Totemic Recall button
+-------------------------------------------------------------------]]
+function COE_Totem:UpdateTotemicRecall( elapsed )
+	---@class Frame
+	local RecallFrame = getglobal( "COETotemicRecallFrame" )
+
+	RecallFrame.UpdateTime = RecallFrame.UpdateTime + elapsed
+	if (RecallFrame.UpdateTime <= COE.UpdateInterval and not RecallFrame.IsMoving) then
+		return
+	end
+
+	if (COE_Config:GetSaved( COEOPT_ENABLETOTEMBAR ) == 1 and COE_Config:GetSaved( COEOPT_ENABLERECALLBUTTON ) == 1) then
+		RecallFrame:Show()
+	else
+		RecallFrame:Hide()
+		return
+	end
+
+	RecallFrame:SetScale( tonumber( COE_Config:GetSaved( COEOPT_SCALING ) ) or 1 )
+
+	if (RecallFrame.IsMoving) then
+		COE_Totem:AdjustDraggedFrames();
+	end
+
+	if RecallFrame.cooldownEnd then
+		---@class FontString
+		local cooldownText = getglobal( "COETotemicRecallText" )
+		local remaining = this.cooldownEnd - GetTime()
+
+		if remaining <= 0 then
+			cooldownText:SetText( "" )
+			RecallFrame.cooldownEnd = nil
+		else
+			cooldownText:SetText( string.format( "%.1f", remaining ) )
+		end
+	end
+
+	RecallFrame.UpdateTime = 0
+end
+
+function COE_Totem:CastTotemicRecall()
+	CastSpellByName( COESTR_TOTEMICRECALL )
+end
+
+--[[ ----------------------------------------------------------------
 	METHOD: COE_Totem:UpdateAllFrames
 
 	PURPOSE: Forces an update of all element frames
@@ -357,6 +476,8 @@ function COE_Totem:ResetFrames()
 	COEWaterFrame:SetPoint( "CENTER", "UIParent", "CENTER", -75, -75 );
 	COEAirFrame:ClearAllPoints();
 	COEAirFrame:SetPoint( "CENTER", "UIParent", "CENTER", 75, -75 );
+	COETotemicRecallFrame:ClearAllPoints();
+	COETotemicRecallFrame:SetPoint( "CENTER", "UIParent", "CENTER", 0, 0 );
 
 	COE_Totem:UpdateFrameCoordinates();
 end
@@ -486,7 +607,7 @@ function COE_Totem:UpdateFrame( elapsed )
 	-- check if visual update is necessary
 	-- ------------------------------------
 	this.UpdateTime = this.UpdateTime + elapsed;
-	if (this.UpdateTime <= COE.UpdateInterval) then
+	if this.UpdateTime <= COE.UpdateInterval and not this.IsMoving then
 		return;
 	end
 
@@ -556,6 +677,7 @@ function COE_Totem:UpdateFrame( elapsed )
 	-- reset update time
 	-- ------------------
 	COETotemFrame.UpdateTime = 0;
+	this.UpdateTime = 0;
 end
 
 --[[ ----------------------------------------------------------------
@@ -855,7 +977,7 @@ function COE_Totem:AdjustDraggedFrames()
 
 	-- adjust all other frames' positions
 	-- -----------------------------------
-	for k = 1, 4 do
+	for k = 1, 5 do
 		if (this.Element ~= COE_Element[ k ]) then
 			local frame = getglobal( "COE" .. COE_Element[ k ] .. "Frame" );
 
@@ -879,7 +1001,7 @@ end
 	PURPOSE: Stores the current element frame coordinates
 -------------------------------------------------------------------]]
 function COE_Totem:UpdateFrameCoordinates()
-	for k = 1, 4 do
+	for k = 1, 5 do
 		local frame = getglobal( "COE" .. COE_Element[ k ] .. "Frame" );
 
 		COEFramePositions[ COE_Element[ k ] ].x = frame:GetLeft();
@@ -1606,7 +1728,7 @@ end
 function COE_Totem:DropdownMenu()
 	local totem = this.totem;
 	local parent = this:GetParent() --[[@as COE_Totem]]
-	local anchor = parent.AnchorTotem.totem;
+	local anchor = parent.AnchorTotem and parent.AnchorTotem.totem or totem
 
 	if not COE_Totem.DropdownFrame then
 		---@class DropdownMenuFrame: Frame

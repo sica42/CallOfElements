@@ -290,4 +290,10 @@ function COE:FixSavedVariables()
 	elseif (Cosmos_RegisterButton) then
 		Cosmos_RegisterButton( BINDING_HEADER_CALLOFELEMENTS, BINDING_HEADER_CALLOFELEMENTS, COE_VERSION, "Interface\\Icons\\INV_Misc_Idol_03", COE_ToggleConfigFrame );
 	end
+
+	-- Set Totemic Recall button position if missing
+	-- ----------------------------------------------
+	if not COEFramePositions.TotemicRecall then
+		COEFramePositions.TotemicRecall = { x = 0, y = 0 }
+	end
 end

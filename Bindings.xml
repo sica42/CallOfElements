@@ -30,10 +30,10 @@
 		end
 	</Binding>
 
-	<!-- Throw suggested totem -->
-	<Binding name="COETHROWADVISED">
+	<!-- Cast Totemic Recall -->
+	<Binding name="COERECALL">
 		if( COE.Initialized ) then
-			COE_Totem:ThrowAdvisedTotem();
+			COE_Totem:CastTotemicRecall();
 		end
 	</Binding>
 

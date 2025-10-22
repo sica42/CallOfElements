@@ -243,6 +243,39 @@
 		</Frames>
 	</Frame>
 	
+	<!-- Recall Frame -->
+	<Frame name="COETotemicRecallFrame" frameStrata="LOW" enableMouse="true" movable="true" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="50" y="50" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>			
+			<CheckButton name="COETotemicRecall" inherits="ActionButtonTemplate">
+				<Size>
+					<AbsDimension x="36" y="36"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" inherits="GameFontNormalLarge" text="">
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<Color r="1" g="0" b="0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</CheckButton>
+		</Frames>
+	</Frame>
 
 	<!-- Totem MainFrame -->
 	<Frame name="COETotemFrame" frameStrata="LOW" hidden="true" parent="UIParent">

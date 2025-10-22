@@ -59,6 +59,7 @@ COEOPT_OVERRIDERANK = 21;
 COEOPT_GROUPBARS = 22;
 COEOPT_FRAMETIMERSONLY = 23;
 COEOPT_ENABLERECALLREMINDER = 24;
+COEOPT_ENABLERECALLBUTTON = 25;
 
 COEMODE_ALLTOTEMS = 1;
 COEMODE_TIMERSONLY = 2;
@@ -81,6 +82,7 @@ COE_Config.Defaults = {
 	[ COEOPT_ENABLETOTEMBAR ] = 1,
 	[ COEOPT_HIDEBACKDROP ] = 1,
 	[ COEOPT_ENABLETIMERS ] = 1,
+	[ COEOPT_ENABLERECALLBUTTON ] = 0,
 	[ COEOPT_ENABLERECALLREMINDER ] = 0,
 	[ COEOPT_TIMERNOTIFICATIONS ] = 1,
 	[ COEOPT_TTALIGNMENT ] = 2,
@@ -109,6 +111,7 @@ COE_Saved = {
 	[ COEOPT_ENABLETOTEMBAR ] = 1,
 	[ COEOPT_HIDEBACKDROP ] = 1,
 	[ COEOPT_ENABLETIMERS ] = 1,
+	[ COEOPT_ENABLERECALLBUTTON ] = 0,
 	[ COEOPT_ENABLERECALLREMINDER ] = 0,
 	[ COEOPT_TIMERNOTIFICATIONS ] = 1,
 	[ COEOPT_TTALIGNMENT ] = 2,
@@ -241,7 +244,7 @@ COE_TotemBars = {
 	Air = { Direction = "Right", Mode = "Flex", FlexCount = 1 },
 };
 
-COE_Element = { "Earth", "Fire", "Water", "Air" };
+COE_Element = { "Earth", "Fire", "Water", "Air", "TotemicRecall" };
 COE_Direction = { "Up", "Down", "Left", "Right" };
 COE_FrameMode = { "Closed", "Open", "Flex", "Hidden" };
 
@@ -273,7 +276,7 @@ function COE_Config:OnFrameLoad()
 	-- --------------
 	COE_Config:RegisterOption( COEOPT_ENABLETOTEMBAR, 'check', COEOptionEnableTotemBar, COE_Config:GetSaved( COEOPT_ENABLETOTEMBAR ) );
 	COE_Config:RegisterOption( COEOPT_ENABLETIMERS, 'check', COEOptionEnableTimers, COE_Config:GetSaved( COEOPT_ENABLETIMERS ) );
-	COE_Config:RegisterOption( COEOPT_ENABLERECALLREMINDER, 'check', COEOptionEnableRecallReminder, COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ));
+	COE_Config:RegisterOption( COEOPT_ENABLERECALLREMINDER, 'check', COEOptionEnableRecallReminder, COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ) );
 	COE_Config:RegisterOption( COEOPT_TIMERNOTIFICATIONS, 'check', nil, COE_Config:GetSaved( COEOPT_TIMERNOTIFICATIONS ) );
 	COE_Config:RegisterOption( COEOPT_TTALIGNMENT, 'combo', nil, COE_Config:GetSaved( COEOPT_TTALIGNMENT ), COEOptionTTAlignmentInit );
 	COE_Config:RegisterOption( COEOPT_DISPLAYMODE, 'combo', nil, COE_Config:GetSaved( COEOPT_DISPLAYMODE ), COEOptionDisplayModeInit );
@@ -293,6 +296,7 @@ function COE_Config:OnFrameLoad()
 	COE_Config:RegisterOption( COEOPT_DISPLAYALIGN, 'combo', nil, COE_Config:GetSaved( COEOPT_DISPLAYALIGN ), COEOptionDisplayAlignInit );
 	COE_Config:RegisterOption( COEOPT_OVERRIDERANK, 'combo', nil, COE_Config:GetSaved( COEOPT_OVERRIDERANK ), COEOptionOverrideRankInit );
 	COE_Config:RegisterOption( COEOPT_GROUPBARS, 'check', COEOptionGroupBars, COE_Config:GetSaved( COEOPT_GROUPBARS ) );
+	COE_Config:RegisterOption( COEOPT_ENABLERECALLBUTTON, 'check', COEOptionEnableRecallButton, COE_Config:GetSaved( COEOPT_ENABLERECALLBUTTON ) );
 	COE_Config:RegisterOption( COEOPT_FRAMETIMERSONLY, 'check', nil, COE_Config:GetSaved( COEOPT_FRAMETIMERSONLY ) );
 end
 
@@ -591,6 +595,7 @@ function COEOptionEnableTotemBar()
 	-- this call is needed if the bar was invisible
 	-- ---------------------------------------------
 	COE_Totem:UpdateAllFrames();
+	COEOptionEnableRecallButton();
 
 	if (COE_Config:GetSaved( COEOPT_ENABLETOTEMBAR ) == 1) then
 		COE_ConfigTotemTotemBar:Enable();
@@ -669,6 +674,16 @@ function COEOptionEnableRecallReminder()
 	else
 		Chronos.unscheduleByName( "COERecallReminder" );
 	end
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionEnableRecellButtonInit
+
+	PURPOSE: Toggle Totemic Recall button
+	-------------------------------------------------------------------]]
+
+function COEOptionEnableRecallButton()
+	COE_Totem:UpdateTotemicRecall( COE[ "ForceUpdate" ] )
 end
 
 --[[ ----------------------------------------------------------------

@@ -443,6 +443,9 @@ function COE:ScanTotems()
 				-- ----------------------------------------------------------
 				COE_DisplayedTotems[ SpellName ][ "Element" ] = totem.Element;
 			end
+		elseif SpellName == COESTR_TOTEMICRECALL then
+			getglobal( "COETotemicRecall" ).spellIndex = i
+			COE_Totem:InitTotemicRecall()
 		end
 
 		i = i + 1;
