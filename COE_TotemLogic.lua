@@ -325,7 +325,7 @@ function COESched_RunRecallCheck()
 
 	for _, totem in COE.ActiveTotems do
 		if totem.isActive then activeTotems = activeTotems + 1 end
-		if totem.OutOfRange then outOfRangeTotems = outOfRangeTotems + 1 end
+		if totem.isActive and totem.OutOfRange then outOfRangeTotems = outOfRangeTotems + 1 end
 	end
 
 	if not COE.RecallReminded and activeTotems > 0 and activeTotems == outOfRangeTotems then
