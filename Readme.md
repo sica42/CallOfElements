@@ -30,21 +30,21 @@ activated in pvp when you target a hostile player of the corresponding class.
 
 # Commands
 
-`/coe` or `/coe config` - Shows the configuration dialog
-`/coe list` or `/coe help` - Shows list of all commands
-`/coe nextset` - Switches to the next custom totem set or the default set
-`/coe priorset` - Switches to the prior custom totem set or the default set
-`/coe set <name>` - Switches to set with the specified name. <name> is case-sensitive
-`/coe restartset` - Next time you throw the active set, it recasts all totems
-`/coe reset` - Resets all timers and the active set
-`/coe resetframes` - Returns all element bars to the screen center
-`/coe resetordering` - Resets the ordering of your totem bars
-`/coe reload` - Reloads all totems and sets
+* `/coe` or `/coe config` - Shows the configuration dialog
+* `/coe list` or `/coe help` - Shows list of all commands
+* `/coe nextset` - Switches to the next custom totem set or the default set
+* `/coe priorset` - Switches to the prior custom totem set or the default set
+* `/coe set <name>` - Switches to set with the specified name. <name> is case-sensitive
+* `/coe restartset` - Next time you throw the active set, it recasts all totems
+* `/coe reset` - Resets all timers and the active set
+* `/coe resetframes` - Returns all element bars to the screen center
+* `/coe resetordering` - Resets the ordering of your totem bars
+* `/coe reload` - Reloads all totems and sets
 
 The following commands only work as macros dragged to your action bars:
-`/coe throwset <name?>`- Throws the active totem set or named set if specificed
-`/coe forcethrowset <name?>` - Will refresh existing totems regardless of settings
-`/coe advised` - Throws the next advised totem
+* `/coe throwset <name?>`- Throws the active totem set or named set if specificed
+* `/coe forcethrowset <name?>` - Will refresh existing totems regardless of settings
+* `/coe advised` - Throws the next advised totem
 
 # Basic install instructions
 
