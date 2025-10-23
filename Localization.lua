@@ -245,7 +245,7 @@ COEMODIFIER_NUMPAD_SHORT = "NP";
 -- ---------------
 COESHELL_INTRO = "Available shell commands for Call Of Elements:";
 COESHELL_CONFIG = "'/coe' or '/coe config' - Shows the configuration dialog";
-COESHELL_LIST = "'/coe list' - Shows this list";
+COESHELL_LIST = "'/coe list' or '/coe help' - Shows this list";
 COESHELL_NEXTSET = "'/coe nexset' - Switches to the next custom totem set or the default set";
 COESHELL_PRIORSET = "'/coe priorset' - Switches to the prior custom totem set or the default set";
 COESHELL_SET = "'/coe set <name>' - Switches to set with the specified name. <name> is case-sensitive";
@@ -255,5 +255,6 @@ COESHELL_RESETFRAMES = "'/coe resetframes' - Returns all element bars to the scr
 COESHELL_RESETORDERING = "'/coe resetordering' - Resets the ordering of your totem bars";
 COESHELL_RELOAD = "'/coe reload' - Reloads all totems and sets";
 COESHELL_MACRONOTE = "The following commands only work as macros dragged to your action bars:";
-COESHELL_THROWSET = "'/coe throwset' - Throws the active totem set";
+COESHELL_THROWSET = "'/coe throwset <name>' - Throws the active totem set or named set if specificed";
+COESHELL_FORCETHROWSET = "'/coe forcethrowset' - Will refresh existing totems regardless of settings"
 COESHELL_ADVISED = "'/coe advised' - Throws the next advised totem";

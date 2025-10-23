@@ -172,12 +172,13 @@ end
 
 	PURPOSE: Executes the entered shell command
 -------------------------------------------------------------------]]
-function COEProcessShellCommand( msg )
-	local _, _, msg, arg = string.find( msg, "(%S*)%s?(.*)" )
+---@param command string
+function COEProcessShellCommand( command )
+	local _, _, msg, arg = string.find( command, "(%S*)%s?(.*)" )
 
 	if (msg == "" or msg == "config") then
 		COE:ToggleConfigFrame();
-	elseif (msg == "list") then
+	elseif (msg == "list" or msg == "help") then
 		COE:DisplayShellCommands();
 	elseif (msg == "nextset") then
 		COE_Totem:SwitchToNextSet();
@@ -228,6 +229,7 @@ function COE:DisplayShellCommands()
 	COE:Message( COESHELL_RELOAD );
 	COE:Message( COESHELL_MACRONOTE );
 	COE:Message( COESHELL_THROWSET );
+	COE:Message( COESHELL_FORCETHROWSET );
 	COE:Message( COESHELL_ADVISED );
 end
 
