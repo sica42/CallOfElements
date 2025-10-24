@@ -257,6 +257,24 @@
 									</Anchor>
 								</Anchors>
 							</CheckButton>
+							<CheckButton name="COE_OptionEnableShieldNotifications" inherits="COE_ConfigCheckButtonTemplate" id="26">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableRecallReminder" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="COE_OptionEnableShieldNotificationsSound" inherits="COE_ConfigCheckButtonTemplate" id="27">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableShieldNotifications" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="48" y="14"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
 							<CheckButton name="COE_OptionEnableTimerNotifications" inherits="COE_ConfigCheckButtonTemplate" id="4">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableTimers" relativePoint="BOTTOMLEFT">

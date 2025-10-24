@@ -74,9 +74,7 @@ function COE_Totem:InitMainFrame()
 	this:RegisterEvent( "LEARNED_SPELL_IN_TAB" );
 	this:RegisterEvent( "PLAYER_TARGET_CHANGED" );
 	this:RegisterEvent( "PLAYER_DEAD" );
-	if not COE.has_superwow then
-		this:RegisterEvent( "PLAYER_AURAS_CHANGED" )
-	end
+	this:RegisterEvent( "PLAYER_AURAS_CHANGED" )
 
 	this:RegisterEvent( "CHAT_MSG_COMBAT_CREATURE_VS_SELF_HITS" );
 	this:RegisterEvent( "CHAT_MSG_COMBAT_HOSTILEPLAYER_HITS" );
@@ -130,6 +128,10 @@ function COE_Totem:OnMainFrameEvent( event )
 			COE_Totem:SwitchPVPSet();
 		end
 	elseif (event == "PLAYER_AURAS_CHANGED") then
+		if COE.has_superwow and COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 0 then
+			return
+		end
+
 		local playerBuffs = {}
 
 		for i = 0, 31 do
@@ -144,14 +146,34 @@ function COE_Totem:OnMainFrameEvent( event )
 			end
 		end
 
-		for _, totem in pairs( COE.ActiveTotems ) do
-			if playerBuffs[ totem.Texture ] then
-				totem.isBuff = true
-				totem.OutOfRange = false
-			else
-				if totem.isBuff then
-					totem.OutOfRange = true
+		if not COE.has_superwow then
+			for _, totem in pairs( COE.ActiveTotems ) do
+				if playerBuffs[ totem.Texture ] then
+					totem.isBuff = true
+					totem.OutOfRange = false
+				else
+					if totem.isBuff then
+						totem.OutOfRange = true
+					end
 				end
+			end
+		end
+
+		if COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 1 then
+			local currentShield
+			for shield, texture in pairs( COE.Shields) do
+				if playerBuffs[ texture ] then
+					currentShield = texture
+					COE.activeShield = shield
+				end
+			end
+			if not currentShield and COE.activeShield then
+				COE:Notification( string.format("%s Shield is gone!", COE.activeShield), COECOL_TOTEMDESTROYED );
+				if COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ) == 1 then
+					PlaySound( "igQuestFailed" )
+					PlaySound( "RaidWarning" )
+				end
+				COE.activeShield = nil
 			end
 		end
 	elseif (event == "PLAYER_DEAD") then
@@ -406,7 +428,7 @@ function COE_Totem:UpdateTotemicRecall( elapsed )
 	if RecallFrame.cooldownEnd then
 		---@class FontString
 		local cooldownText = getglobal( "COETotemicRecallText" )
-		local remaining = this.cooldownEnd - GetTime()
+		local remaining = RecallFrame.cooldownEnd - GetTime()
 
 		if remaining <= 0 then
 			cooldownText:SetText( "" )

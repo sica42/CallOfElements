@@ -133,6 +133,12 @@ COE[ "CleansingTotems" ] = {
 };
 
 
+COE[ "Shields" ] = {
+	Lightning = "Interface\\Icons\\Spell_Nature_LightningShield",
+	Earth = "Interface\\Icons\\Spell_Nature_SkinofEarth",
+	Water = "Interface\\Icons\\Ability_Shaman_WaterShield"
+}
+
 --[[ ----------------------------------------------------------------
 	COE.TotemSets contains the totem pointers for each set and
 	element
