@@ -4,6 +4,7 @@ This is a fork of [MarcelineVQ version](https://github.com/MarcelineVQ/CallOfEle
 * Supports dropping all totems with 1 click if [nampower](https://gitea.com/avitasia/nampower) mod is installed. If not, you have to click the button 4 times.
 * Shows when a totem is out of range. If you have [superWoW](https://github.com/balakethelock/SuperWoW) mod installed it will work on all totems, if not it will only work on totems that give you a buff.
 * Option to show reminder to recall totems when they are all out of range. Only works for totems that give you a buff if superWoW is not installed.
+* Option to show/sound warning when your current shield fades.
 * Totemic Recall button included with dedicated key binding. Off by default, toggle on in settings.
 * Right click any anchor button to quickly switch set or access config dialog.
 * Ctrl-clicking a totem not in current set will drop and move it to current set.
