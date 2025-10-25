@@ -248,6 +248,33 @@
 									</Anchor>
 								</Anchors>
 							</CheckButton>
+							<CheckButton name="COE_OptionEnableTimerNotifications" inherits="COE_ConfigCheckButtonTemplate" id="4">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableTimers" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="COE_OptionAdvisor" inherits="COE_ConfigCheckButtonTemplate" id="8">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableTimerNotifications" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="COE_OptionAdvisorSound" inherits="COE_ConfigCheckButtonTemplate" id="29">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionAdvisor" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="48" y="16"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
 							<CheckButton name="COE_OptionEnableRecallReminder" inherits="COE_ConfigCheckButtonTemplate" id="24">
 								<Anchors>
 									<Anchor point="TOPLEFT">
@@ -270,25 +297,43 @@
 								<Anchors>
 									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableShieldNotifications" relativePoint="BOTTOMLEFT">
 										<Offset>
-											<AbsDimension x="48" y="14"/>
+											<AbsDimension x="48" y="16"/>
 										</Offset>
 									</Anchor>
 								</Anchors>
 							</CheckButton>
-							<CheckButton name="COE_OptionEnableTimerNotifications" inherits="COE_ConfigCheckButtonTemplate" id="4">
+							<CheckButton name="COE_OptionEnableWeaponNotifications" inherits="COE_ConfigCheckButtonTemplate" id="28">
 								<Anchors>
-									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableTimers" relativePoint="BOTTOMLEFT">
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableShieldNotifications" relativePoint="BOTTOMLEFT">
 										<Offset>
 											<AbsDimension x="0" y="0"/>
 										</Offset>
 									</Anchor>
 								</Anchors>
 							</CheckButton>
+							<CheckButton name="COE_OptionEnableWeaponNotificationsSound" inherits="COE_ConfigCheckButtonTemplate" id="29">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableWeaponNotifications" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="48" y="16"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
 							<CheckButton name="COE_OptionEnableTimerFrame" inherits="COE_ConfigCheckButtonTemplate" id="20">
 								<Anchors>
-									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableTimerNotifications" relativePoint="BOTTOMLEFT">
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionAdvisor" relativePoint="BOTTOMLEFT">
 										<Offset>
-											<AbsDimension x="0" y="-5"/>
+											<AbsDimension x="0" y="-25"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+							<CheckButton name="COE_OptionFrameTimersOnly" inherits="COE_ConfigCheckButtonTemplate" id="23">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableTimerFrame" relativePoint="TOPLEFT">
+										<Offset>
+											<AbsDimension x="150" y="0"/>
 										</Offset>
 									</Anchor>
 								</Anchors>
@@ -302,31 +347,11 @@
 									</Anchor>
 								</Anchors>
 							</Button>
-							<CheckButton name="COE_OptionFrameTimersOnly" inherits="COE_ConfigCheckButtonTemplate" id="23">
+							<Button name="COE_OptionOverrideRank" inherits="COE_ConfigComboBoxTemplate" id="21">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativeTo="COE_OptionDisplayAlignment" relativePoint="BOTTOMLEFT">
 										<Offset>
-											<AbsDimension x="0" y="-8"/>
-										</Offset>
-									</Anchor>
-								</Anchors>
-							</CheckButton>
-
-							<CheckButton name="COE_OptionAdvisor" inherits="COE_ConfigCheckButtonTemplate" id="8">
-								<Anchors>
-									<Anchor point="TOPLEFT" relativeTo="COE_OptionFrameTimersOnly" relativePoint="BOTTOMLEFT">
-										<Offset>
-											<AbsDimension x="0" y="-15"/>
-										</Offset>
-									</Anchor>
-								</Anchors>
-							</CheckButton>
-
-							<Button name="COE_OptionOverrideRank" inherits="COE_ConfigComboBoxTemplate" id="21">
-								<Anchors>
-									<Anchor point="TOPLEFT" relativeTo="COE_OptionAdvisor" relativePoint="BOTTOMLEFT">
-										<Offset>
-											<AbsDimension x="0" y="-10"/>
+											<AbsDimension x="0" y="-30"/>
 										</Offset>
 									</Anchor>
 								</Anchors>

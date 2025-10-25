@@ -15,7 +15,7 @@ end
 ---@diagnostic disable-next-line: undefined-global
 COE[ "has_superwow" ] = SetAutoloot and true or false
 
-COE_VERSION = 2.8
+COE_VERSION = GetAddOnMetadata( "CallOfElements", "Version" )
 
 COECOL_TOTEMWARNING = 1;
 COECOL_TOTEMDESTROYED = 2;
@@ -49,7 +49,7 @@ COE[ "AdvisorInterval" ] = 1;
 COE[ "AdvisorWarningInterval" ] = 7;
 
 COE[ "RecallReminderInterval" ] = 1;
-
+COE[ "WeaponCheckInterval" ] = 1;
 
 --[[ ----------------------------------------------------------------
 	METHOD: COE:Init
@@ -132,7 +132,7 @@ end;
 	PURPOSE: Adds a message to the error frame in the upper
 		screen center
 -------------------------------------------------------------------]]
-function COE:Notification( msg, color )
+function COE:Notification( msg, color, alarm )
 	local col;
 
 	-- choose color
@@ -150,6 +150,13 @@ function COE:Notification( msg, color )
 	-- add message
 	-- ------------
 	UIErrorsFrame:AddMessage( msg, col.r, col.g, col.b, 1.0, UIERRORS_HOLD_TIME );
+
+	-- play alarm sound
+	-- -----------------
+	if (alarm) then
+		PlaySound( "RaidWarning" )
+		PlaySound( "igQuestFailed" )
+	end
 end;
 
 --[[ ----------------------------------------------------------------

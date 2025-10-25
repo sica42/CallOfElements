@@ -218,7 +218,9 @@ function COESched_AdviseTotem( totem, msg )
 	if (COE_Config:GetSaved( COEOPT_ADVISOR ) == 1 and totem.Warn) then
 		-- issue warning
 		-- --------------
-		COE:Notification( string.format( COESTR_CLEANSINGTOTEM, msg ), COECOL_TOTEMCLEANSING );
+		COE:Notification( string.format( COESTR_CLEANSINGTOTEM, msg ), COECOL_TOTEMCLEANSING,
+			COE_Config:GetSaved( COEOPT_ADVISORSOUND ) == 1
+		);
 
 		-- reschedule
 		-- -----------
@@ -319,6 +321,12 @@ function COESched_RunAdvisor()
 	Chronos.scheduleByName( "COEAdvise", COE.AdvisorInterval, COESched_RunAdvisor );
 end
 
+--[[ ----------------------------------------------------------------
+	METHOD: COESched_RunRecallCheck
+
+	PURPOSE: Checks if all active totems are out of range and
+		notifies the player to recall them
+-------------------------------------------------------------------]]
 function COESched_RunRecallCheck()
 	local activeTotems = 0
 	local outOfRangeTotems = 0
@@ -336,6 +344,53 @@ function COESched_RunRecallCheck()
 	-- reschedule
 	-- -----------
 	Chronos.scheduleByName( "COERecallReminder", COE.RecallReminderInterval, COESched_RunRecallCheck );
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COESched_RunWeaponCheck
+
+	PURPOSE: Checks if the weapon enchant is still active and
+		notifies the player if it has faded
+-------------------------------------------------------------------]]
+function COESched_RunWeaponCheck()
+	local mainHand = GetWeaponEnchantInfo()
+
+	if mainHand and not COE.WeaponEnchant then
+		COETotemTT:SetInventoryItem( "player", 16 )
+
+		local numLines = COETotemTT:NumLines()
+		for i = 1, numLines do
+			local line = getglobal( "COETotemTTTextLeft" .. i ):GetText()
+
+			if string.find( line, COESTR_WEAPON_ROCKBITER ) then
+				COE.WeaponEnchant = COESTR_WEAPON_ROCKBITER
+			elseif string.find( line, COESTR_WEAPON_FLAMETONGUE ) then
+				COE.WeaponEnchant = COESTR_WEAPON_FLAMETONGUE
+			elseif string.find( line, COESTR_WEAPON_FROSTBRAND ) then
+				COE.WeaponEnchant = COESTR_WEAPON_FROSTBRAND
+			elseif string.find( line, COESTR_WEAPON_WINDFURY ) then
+				COE.WeaponEnchant = COESTR_WEAPON_WINDFURY
+			end
+
+			if COE.WeaponEnchant then
+				COE.WeaponCurrent = GetInventoryItemLink( "player", 16 )
+				break
+			end
+		end
+	elseif not mainHand and COE.WeaponEnchant then
+		-- No weapon enchant, make sure it's the same weapon as before and warn if so
+		if COE.WeaponCurrent == GetInventoryItemLink( "player", 16 ) then
+			COE:Notification( string.format( COESTR_WEAPON, COE.WeaponEnchant ), COECOL_TOTEMDESTROYED,
+				COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND ) == 1
+			)
+		end
+		COE.WeaponEnchant = nil
+		COE.WeaponCurrent = nil
+	end
+
+	-- reschedule
+	-- -----------
+	Chronos.scheduleByName( "COEWeaponCheck", COE.WeaponCheckInterval, COESched_RunWeaponCheck );
 end
 
 --[[ ----------------------------------------------------------------
@@ -661,7 +716,7 @@ function COE_Totem:ThrowSet( set, forced )
 			local activeTotem = COE.ActiveTotems[ element ]
 
 			local isOutOfRange = COE_Config:GetSaved( COEOPT_ENABLEDISTANCECHECK ) == 1 and activeTotem and activeTotem.guid and
-			COE_Totem:OutOfRange( "player", activeTotem.guid, 20 )
+					COE_Totem:OutOfRange( "player", activeTotem.guid, 20 )
 			local isForcedUpdate = forced
 			local isDifferentTotem = activeTotem ~= totemData
 			local isInactiveTotem = activeTotem and not activeTotem.isActive

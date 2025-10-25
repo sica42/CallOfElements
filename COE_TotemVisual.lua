@@ -104,8 +104,16 @@ function COE_Totem:OnMainFrameEvent( event )
 			Chronos.scheduleByName( "COEAdvise", COE.AdvisorInterval, COESched_RunAdvisor );
 		end
 
+		-- start recall reminder schedule
+		-- -------------------------------
 		if (COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ) == 1) then
 			Chronos.scheduleByName( "COERecallReminder", COE.RecallReminderInterval, COESched_RunRecallCheck )
+		end
+
+		-- start weapon check schedule
+		-- ----------------------------
+		if (COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONS ) == 1) then
+			Chronos.scheduleByName( "COEWeaponCheck", COE.WeaponCheckInterval, COESched_RunWeaponCheck )
 		end
 
 		-- get current element frame coordinates
@@ -161,18 +169,16 @@ function COE_Totem:OnMainFrameEvent( event )
 
 		if COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 1 then
 			local currentShield
-			for shield, texture in pairs( COE.Shields) do
+			for shield, texture in pairs( COE.Shields ) do
 				if playerBuffs[ texture ] then
 					currentShield = texture
 					COE.activeShield = shield
 				end
 			end
 			if not currentShield and COE.activeShield then
-				COE:Notification( string.format("%s Shield is gone!", COE.activeShield), COECOL_TOTEMDESTROYED );
-				if COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ) == 1 then
-					PlaySound( "igQuestFailed" )
-					PlaySound( "RaidWarning" )
-				end
+				COE:Notification( string.format( COESTR_SHIELD, COE.activeShield ), COECOL_TOTEMDESTROYED,
+					COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ) == 1
+				)
 				COE.activeShield = nil
 			end
 		end

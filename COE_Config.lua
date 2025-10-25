@@ -62,6 +62,9 @@ COEOPT_ENABLERECALLREMINDER = 24;
 COEOPT_ENABLERECALLBUTTON = 25;
 COEOPT_ENABLESHIELDNOTIFICATIONS = 26;
 COEOPT_ENABLESHIELDNOTIFICATIONSSOUND = 27;
+COEOPT_ENABLEWEAPONNOTIFICATIONS = 28;
+COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND = 29;
+COEOPT_ADVISORSOUND = 30;
 
 COEMODE_ALLTOTEMS = 1;
 COEMODE_TIMERSONLY = 2;
@@ -88,11 +91,14 @@ COE_Config.Defaults = {
 	[ COEOPT_ENABLERECALLREMINDER ] = 0,
 	[ COEOPT_ENABLESHIELDNOTIFICATIONS ] = 0,
 	[ COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ] = 0,
+	[ COEOPT_ENABLEWEAPONNOTIFICATIONS ] = 0,
+	[ COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND ] = 0,
 	[ COEOPT_TIMERNOTIFICATIONS ] = 1,
 	[ COEOPT_TTALIGNMENT ] = 2,
 	[ COEOPT_DISPLAYMODE ] = 1,
 	[ COEOPT_DISPLAYALIGN ] = 1,
 	[ COEOPT_ADVISOR ] = 1,
+	[ COEOPT_ADVISORSOUND ] = 0,
 	[ COEOPT_ENABLESETS ] = 1,
 	[ COEOPT_ENABLEFORCESETS ] = 0,
 	[ COEOPT_ENABLEDISTANCECHECK ] = 0,
@@ -119,11 +125,14 @@ COE_Saved = {
 	[ COEOPT_ENABLERECALLREMINDER ] = 0,
 	[ COEOPT_ENABLESHIELDNOTIFICATIONS ] = 0,
 	[ COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ] = 0,
+	[ COEOPT_ENABLEWEAPONNOTIFICATIONS ] = 0,
+	[ COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND ] = 0,
 	[ COEOPT_TIMERNOTIFICATIONS ] = 1,
 	[ COEOPT_TTALIGNMENT ] = 2,
 	[ COEOPT_DISPLAYMODE ] = 1,
 	[ COEOPT_DISPLAYALIGN ] = 1,
 	[ COEOPT_ADVISOR ] = 1,
+	[ COEOPT_ADVISORSOUND ] = 0,
 	[ COEOPT_ENABLESETS ] = 1,
 	[ COEOPT_ENABLEFORCESETS ] = 0,
 	[ COEOPT_ENABLEDISTANCECHECK ] = 0,
@@ -278,17 +287,24 @@ function COE_Config:OnFrameLoad()
 	-- --------------------------
 	this:RegisterForDrag( "LeftButton" );
 
+	-- make the dialog closable with ESC
+	-- ----------------------------------
+	table.insert( UISpecialFrames, this:GetName() )
+
 	-- totem options
 	-- --------------
 	COE_Config:RegisterOption( COEOPT_ENABLETOTEMBAR, 'check', COEOptionEnableTotemBar, COE_Config:GetSaved( COEOPT_ENABLETOTEMBAR ) );
 	COE_Config:RegisterOption( COEOPT_ENABLETIMERS, 'check', COEOptionEnableTimers, COE_Config:GetSaved( COEOPT_ENABLETIMERS ) );
 	COE_Config:RegisterOption( COEOPT_ENABLERECALLREMINDER, 'check', COEOptionEnableRecallReminder, COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ) );
-	COE_Config:RegisterOption( COEOPT_ENABLESHIELDNOTIFICATIONS, 'check', COEOptionEnableRecallReminder, COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) );
+	COE_Config:RegisterOption( COEOPT_ENABLESHIELDNOTIFICATIONS, 'check', COEOptionShieldChange, COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) );
 	COE_Config:RegisterOption( COEOPT_ENABLESHIELDNOTIFICATIONSSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ) );
+	COE_Config:RegisterOption( COEOPT_ENABLEWEAPONNOTIFICATIONS, 'check', COEOptionWeaponChange, COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONS ) );
+	COE_Config:RegisterOption( COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND ) );
 	COE_Config:RegisterOption( COEOPT_TIMERNOTIFICATIONS, 'check', nil, COE_Config:GetSaved( COEOPT_TIMERNOTIFICATIONS ) );
 	COE_Config:RegisterOption( COEOPT_TTALIGNMENT, 'combo', nil, COE_Config:GetSaved( COEOPT_TTALIGNMENT ), COEOptionTTAlignmentInit );
 	COE_Config:RegisterOption( COEOPT_DISPLAYMODE, 'combo', nil, COE_Config:GetSaved( COEOPT_DISPLAYMODE ), COEOptionDisplayModeInit );
 	COE_Config:RegisterOption( COEOPT_ADVISOR, 'check', COEOptionEnableAdvisor, COE_Config:GetSaved( COEOPT_ADVISOR ) );
+	COE_Config:RegisterOption( COEOPT_ADVISORSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_ADVISORSOUND ) );
 	COE_Config:RegisterOption( COEOPT_ENABLESETS, 'check', COEOptionEnableSets, COE_Config:GetSaved( COEOPT_ENABLESETS ) );
 	COE_Config:RegisterOption( COEOPT_ENABLEFORCESETS, 'check', nil, COE_Config:GetSaved( COEOPT_ENABLEFORCESETS ) );
 	COE_Config:RegisterOption( COEOPT_ENABLEDISTANCECHECK, 'check', nil, COE_Config:GetSaved( COEOPT_ENABLEDISTANCECHECK ) );
@@ -307,7 +323,9 @@ function COE_Config:OnFrameLoad()
 	COE_Config:RegisterOption( COEOPT_ENABLERECALLBUTTON, 'check', COEOptionEnableRecallButton, COE_Config:GetSaved( COEOPT_ENABLERECALLBUTTON ) );
 	COE_Config:RegisterOption( COEOPT_FRAMETIMERSONLY, 'check', nil, COE_Config:GetSaved( COEOPT_FRAMETIMERSONLY ) );
 
+	COEOptionScaleCheckButton( getglobal( "COE_OptionAdvisorSound" ) )
 	COEOptionScaleCheckButton( getglobal( "COE_OptionEnableShieldNotificationsSound" ) )
+	COEOptionScaleCheckButton( getglobal( "COE_OptionEnableWeaponNotificationsSound" ) )
 end
 
 --[[ ----------------------------------------------------------------
@@ -679,10 +697,42 @@ end
 function COEOptionEnableRecallReminder()
 	if (COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ) == 1) then
 		if (not Chronos.isScheduledByName( "COERecallReminder" )) then
-			Chronos.scheduleByName( "COERecallReminder", COE.RecallReminderInterval, COESched_RunRecallCheck );
+			Chronos.scheduleByName( "COERecallReminder", COE.RecallReminderInterval, COESched_RunRecallCheck )
 		end
 	else
-		Chronos.unscheduleByName( "COERecallReminder" );
+		Chronos.unscheduleByName( "COERecallReminder" )
+	end
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionShieldChange
+
+	PURPOSE: Enable/disable shield sound option
+	-------------------------------------------------------------------]]
+function COEOptionShieldChange()
+	if (COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 1) then
+		getglobal( "COE_OptionEnableShieldNotificationsSound" ):Enable()
+	else
+		getglobal( "COE_OptionEnableShieldNotificationsSound" ):Disable()
+	end
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionWeaponChange
+
+	PURPOSE: Schedules the weapon check if enabled
+					 Enable/disable weapon sound option
+	-------------------------------------------------------------------]]
+
+function COEOptionWeaponChange()
+	if (COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONS ) == 1) then
+		getglobal( "COE_OptionEnableWeaponNotificationsSound" ):Enable()
+		if (not Chronos.isScheduledByName( "COEWeaponCheck" )) then
+			Chronos.scheduleByName( "COEWeaponCheck", COE.WeaponCheckInterval, COESched_RunWeaponCheck )
+		end
+	else
+		getglobal( "COE_OptionEnableWeaponNotificationsSound" ):Disable()
+		Chronos.unscheduleByName( "COEWeaponCheck" )
 	end
 end
 
@@ -691,11 +741,16 @@ end
 
 	PURPOSE: Toggle Totemic Recall button
 	-------------------------------------------------------------------]]
-
 function COEOptionEnableRecallButton()
 	COE_Totem:UpdateTotemicRecall( COE[ "ForceUpdate" ] )
 end
 
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionScaleCheckButton
+
+	PURPOSE: Scales down a check button and scales up its text
+	-------------------------------------------------------------------]]
 function COEOptionScaleCheckButton( button )
 	---@type FontString
 	local text = getglobal( button:GetName() .. "Text" )
@@ -778,9 +833,11 @@ end
 	METHOD: COEOptionEnableAdvisor()
 
 	PURPOSE: Schedules the advisor check if enabled
+					 Enable/disable advisor sound option
 -------------------------------------------------------------------]]
 function COEOptionEnableAdvisor()
 	if (COE_Config:GetSaved( COEOPT_ADVISOR ) == 1) then
+		getglobal( "COE_OptionAdvisorSound" ):Enable()
 		-- schedule only if not already scheduled to prevent
 		-- rescheduling on config dialog display
 		-- --------------------------------------------------
@@ -788,6 +845,7 @@ function COEOptionEnableAdvisor()
 			Chronos.scheduleByName( "COEAdvise", COE.AdvisorInterval, COESched_RunAdvisor );
 		end
 	else
+		getglobal( "COE_OptionAdvisorSound" ):Disable()
 		Chronos.unscheduleByName( "COEAdvise" );
 		COE.CleansingTotems.Tremor.Warn = false;
 		COE.CleansingTotems.Disease.Warn = false;

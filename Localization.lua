@@ -31,6 +31,8 @@ COESTR_HEALING = "Healing %s with %s (Rank %d)";
 COESTR_HEALLOWERRANK = "Not enough mana. Using rank %d instead";
 COESTR_HEALOOM = "Out of mana!";
 COESTR_RECALL = "All totems out of range, consider casting Totemic Recall"
+COESTR_SHIELD = "Your %s shield has faded!";
+COESTR_WEAPON = "Your %s enchant has faded!";
 
 
 -- String patterns
@@ -93,6 +95,13 @@ COESTR_ELEMENT_FIRE = "Fire";
 COESTR_ELEMENT_WATER = "Water";
 COESTR_ELEMENT_AIR = "Air";
 
+-- Weapon Enchants
+-- -----------------
+COESTR_WEAPON_ROCKBITER = "Rockbiter";
+COESTR_WEAPON_FLAMETONGUE = "Flametongue";
+COESTR_WEAPON_FROSTBRAND = "Frostbrand";
+COESTR_WEAPON_WINDFURY = "Windfury";
+
 
 -- UI elements
 -- ------------
@@ -109,13 +118,16 @@ COE_OptionHideBackdrop = "Hide background when inactive";
 COE_OptionEnableTimers = "Enable totem timers";
 COE_OptionEnableRecallReminder = "Enable Totemic Recall reminder";
 COE_OptionEnableRecallButton = "Show Totemic Recall button";
-COE_OptionEnableShieldNotifications = "Enable shield notifications";
+COE_OptionEnableShieldNotifications = "Enable shield notification";
 COE_OptionEnableShieldNotificationsSound = "Enable warning sound";
+COE_OptionEnableWeaponNotifications = "Enable weapon enchant notification";
+COE_OptionEnableWeaponNotificationsSound = "Enable warning sound";
 COE_OptionEnableTimerNotifications = "Enable notifications";
 COE_OptionTTAlignment = "Tooltip Alignment";
 COE_OptionDisplayMode = "Anchor Button";
 COE_OptionDisplayAlignment = "Button Alignment";
 COE_OptionAdvisor = "Enable totem advisor";
+COE_OptionAdvisorSound = "Enable warning sound";
 COE_OptionEnableSets = "Enable totem sets";
 COE_OptionEnableForceSets = "Enable forced totem placing";
 COE_OptionEnableDistanceCheck = "Totem distance checking";
@@ -154,7 +166,8 @@ COE_OptionHideBackdrop = "Hides the background when the mouse\nis not above the 
 COE_OptionEnableTimers = "Enables the display of\nthe remaining totem time\nshown inside the totem button";
 COE_OptionEnableRecallReminder = "Displays a reminder to recall totems\nwhen all totems are out of range";
 COE_OptionEnableRecallButton = "Shows Totamic Recall button";
-COE_OptionEnableShieldNotifications = "Displays warning when your current shield fades";
+COE_OptionEnableShieldNotifications = "Displays warning when\nyour shield fades";
+COE_OptionEnableWeaponNotifications = "Displays warning when\nyour weapon enchant fades";
 COE_OptionEnableTimerNotifications = "Displays warnings when a totem\nexpires or is destroyed";
 COE_OptionAdvisor = "Displays notifications when you\nor a member of your party/raid\nhas a debuff that can be cured\nby one of your totems";
 COE_OptionEnableForceSets = "Always replace active totems\nwhen placing a set";
