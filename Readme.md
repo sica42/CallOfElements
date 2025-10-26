@@ -5,10 +5,12 @@ This is a fork of [MarcelineVQ version](https://github.com/MarcelineVQ/CallOfEle
 * Shows when a totem is out of range. If you have [superWoW](https://github.com/balakethelock/SuperWoW) mod installed it will work on all totems, if not it will only work on totems that give you a buff.
 * Option to show reminder to recall totems when they are all out of range. Only works for totems that give you a buff if superWoW is not installed.
 * Option to show/sound warning when your current shield fades.
+* Option to show/sound warning when your weapon enchant fades.
 * Totemic Recall button included with dedicated key binding. Off by default, toggle on in settings.
 * Right click any anchor button to quickly switch set or access config dialog.
 * Ctrl-clicking a totem not in current set will drop and move it to current set.
 * SuperWow only: Config option to re-drop active totems if they're more then 20y away.
+* SuperWoW only: Throwing advised totems will re-drop any totem that is out of range.
 * Bug fixes: Timers will reset if a totem is destroyed. Improved performance by fixing a bug that made buttons update to frequently.
 
 # CallOfElements for vanilla WOW
