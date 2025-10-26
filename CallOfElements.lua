@@ -5,15 +5,62 @@
 
 	by Wyverex (2006)
         by laytya (2018-2022)
-
+							by Sica(2025-)
 ]]
 
-if (not COE) then
-	COE = {};
-end
+---@class TotemRank
+---@field SpellID number
+---@field Mana number
+---@field Duration number
+---@field Health number
+---@field Cooldown number
+
+---@class COE
+---@field Initialized boolean
+---@field hasSuperwow boolean
+---@field DebugMode boolean
+---@field ConfigureBarMode boolean
+---@field ConfigureOrderMode boolean
+---@field ConfigureSetsMode boolean
+---@field UpdateInterval number
+---@field ForceUpdate number
+---@field AdvisorInterval number
+---@field AdvisorWarningInterval number
+---@field RecallReminderInterval number
+---@field RecallReminded boolean
+---@field WeaponCheckInterval number
+---@field WeaponEnchant string|nil
+---@field WeaponCurrent string|nil
+---@field Shields table<string, string>
+---@field activeShield string|nil
+---@field LastActiveSet string
+---@field ActiveTotems table<TotemElement, Totem>
+---@field MaxTotems table<TotemElement, number>
+---@field CleansingTotems table<string, CleansingTotem>
+---@field TotemsAvailable table<TotemElement, number>
+---@field TotemPendings table<Totem, TotemPending>
+---@field TotemPending TotemPending
+---@field TotemData table<number, Totem>
+---@field TotemTicks table<string, number>
+---@field TotemCount number
+---@field NoTotem Totem
+---@field SetCycle SetCycle
+---@field TotemSets table<number, table>
+---@field TotemSetCount number
+---@field Init fun( self: COE )
+---@field OnEvent fun( self: COE, event: string )
+---@field Message fun( self: COE, msg: string )
+---@field DebugMessage fun( self: COE, msg: string )
+---@field Notification fun( self: COE, msg: string, color: number, alarm: boolean? )
+---@field ToggleConfigFrame fun( self: COE )
+---@field DisplayShellCommands fun( self: COE )
+---@field FixSavedVariables fun( self: COE )
+
+---@type COE
+COE = COE or {}
 
 ---@diagnostic disable-next-line: undefined-global
-COE[ "has_superwow" ] = SetAutoloot and true or false
+COE.hasSuperwow = SetAutoloot and true or false
 
 COE_VERSION = GetAddOnMetadata( "CallOfElements", "Version" )
 
@@ -67,7 +114,7 @@ function COE:Init()
 		COE.Initialized = true;
 		COE:Message( "Call of Elements v" .. COE_VERSION .. " mod CFM /coe" );
 		this:RegisterEvent( "VARIABLES_LOADED" );
-		if COE.has_superwow then
+		if COE.hasSuperwow then
 			this:RegisterEvent( "UNIT_MODEL_CHANGED" );
 		end
 
@@ -154,8 +201,7 @@ function COE:Notification( msg, color, alarm )
 	-- play alarm sound
 	-- -----------------
 	if (alarm) then
-		PlaySound( "RaidWarning" )
-		PlaySound( "igQuestFailed" )
+		PlaySoundFile( "Interface\\AddOns\\CallOfElements\\Assets\\Alarm.wav" );
 	end
 end;
 

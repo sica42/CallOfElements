@@ -8,10 +8,25 @@
 	Healing Module
 ]]
 
-if (not COE_Heal) then
-	COE_Heal = {};
-end
+---@class COE_Heal
+---@field Thresholds table<string, number>
+---@field Init fun( self: COE_Heal )
+---@field OnEvent fun( self: COE_Heal, event: string )
+---@field BestHeal fun( self: COE_Heal )
+---@field BattleHeal fun( self: COE_Heal )
+---@field Heal fun( self: COE_Heal, type: "best" | "battle" )
+---@field DetermineHealTarget fun( self: COE_Heal ): HealTarget
+---@field DetermineBestSpell fun( self: COE_Heal, spelltable: table<number, HealingSpell>, healamount: number ): number?, string?, number?
+---@field DetermineBattleSpell fun( self: COE_Heal, healamount: number ): number?, string?, number?
 
+---@class HealTarget
+---@field target UnitId?
+---@field ratio number
+---@field current integer
+---@field max integer
+
+---@type COE_Heal
+COE_Heal = COE_Heal or {}
 
 --[[ ----------------------------------------------------------------
 	COE_Heal.Thresholds stores different healing thresholds
@@ -154,6 +169,7 @@ end
 		member falls below the OverrideTarget threshold
 -------------------------------------------------------------------]]
 function COE_Heal:DetermineHealTarget()
+	---@type HealTarget
 	local toBeHealed = { target = nil, ratio = 1.0, current = 0, max = 0 };
 
 	-- first check the player
@@ -169,7 +185,6 @@ function COE_Heal:DetermineHealTarget()
 
 	-- then check the party
 	-- ---------------------
-	local i;
 	for i = 1, GetNumPartyMembers() do
 		curHealth = UnitHealth( "party" .. i );
 		maxHealth = UnitHealthMax( "party" .. i )

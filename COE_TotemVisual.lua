@@ -10,9 +10,47 @@
 
 ]]
 
+---@class COE_Totem
+---@field InitMainFrame fun( self: COE_Totem )
+---@field OnMainFrameEvent fun( self: COE_Totem, event: Event )
+---@field ConfigureTotemButtons fun( self: COE_Totem )
+---@field InitTotemicRecall fun( self: COE_Totem )
+---@field UpdateTotemicRecall fun( self: COE_Totem, elapsed: number )
+---@field CastTotemicRecall fun( self: COE_Totem )
+---@field UpdateAllFrames fun( self: COE_Totem )
+---@field ResetFrames fun( self: COE_Totem )
+---@field InitFrame fun( self: COE_Totem )
+---@field OnFrameEvent fun( self: COE_Totem, event: Event )
+---@field Invalidate fun( self: COE_Totem, frame: COE_Totem, Anchor: boolean, Static: boolean, Dynamic: boolean )
+---@field UpdateFrame fun( self: COE_Totem, elapsed: number )
+---@field UpdateAnchorButton fun( self: COE_Totem )
+---@field UpdateStatic fun( self: COE_Totem )
+---@field UpdateDynamic fun( self: COE_Totem )
+---@field AdjustDraggedFrames fun( self: COE_Totem )
+---@field UpdateFrameCoordinates fun( self: COE_Totem )
+-- Button
+---@field OnTotemButtonLoad fun( self: COE_Totem )
+---@field OnTotemButtonEvent fun( self: COE_Totem, event: Event )
+---@field UpdateTotemButton fun( self: COE_Totem, elapsed: number )
+---@field UpdateTotemButtonCooldown fun( self: COE_Totem )
+---@field UpdateTotemButtonIsUsable fun( self: COE_Totem )
+---@field UpdateTotemButtonHotKey fun( self: COE_Totem )
+---@field UpdateTotemButtonFlash fun( self: COE_Totem, elapsed: number )
+---@field OnEnterTotemButton fun( self: COE_Totem )
+---@field OnLeaveTotemButton fun( self: COE_Totem )
+---@field OnTotemButtonClick fun( self: COE_Totem )
+---@field ButtonStartDrag fun( self: COE_Totem )
+---@field ButtonStopDrag fun( self: COE_Totem )
+---@field MakeAnchorTotem fun(self: COE_Totem, button: table )
+---@field SetTimerText fun( self: COE_Totem )
+---@field DropdownMenu fun( self: COE_Totem )
+---@field DropdownMenuInitialize fun( self: COE_Totem )
+-- TimerFrame
+---@field InitTimerFrame fun( self: COE_Totem )
+---@field UpdateTimerFrame fun( self: COE_Totem, elapsed: number )
+
 ---@type COE_Totem
 COE_Totem = COE_Totem or {}
-local COE_Totem = COE_Totem
 
 COEUI_BUTTONGAP = 4;
 
@@ -136,7 +174,7 @@ function COE_Totem:OnMainFrameEvent( event )
 			COE_Totem:SwitchPVPSet();
 		end
 	elseif (event == "PLAYER_AURAS_CHANGED") then
-		if COE.has_superwow and COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 0 then
+		if COE.hasSuperwow and COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 0 then
 			return
 		end
 
@@ -154,7 +192,7 @@ function COE_Totem:OnMainFrameEvent( event )
 			end
 		end
 
-		if not COE.has_superwow then
+		if not COE.hasSuperwow then
 			for _, totem in pairs( COE.ActiveTotems ) do
 				if playerBuffs[ totem.Texture ] then
 					totem.isBuff = true
@@ -1700,7 +1738,7 @@ function COE_Totem:SetTimerText()
 			-- set the color
 			-- --------------
 			overlaytex:SetVertexColor( 0.1, 0.1, 0.1, 0.75 )
-			if (COE.has_superwow and COE_Totem:OutOfRange( "player", this.totem.guid, this.totem.Range * 1.07 )) or ((not COE.has_superwow or not UnitExists( this.totem.guid )) and this.totem.OutOfRange) then
+			if (COE.hasSuperwow and COE_Totem:OutOfRange( "player", this.totem.guid, this.totem.Range * 1.07 )) or ((not COE.hasSuperwow or not UnitExists( this.totem.guid )) and this.totem.OutOfRange) then
 				timertext:SetVertexColor( 1, 0, 0, 1 )
 				this.totem.OutOfRange = true
 			else

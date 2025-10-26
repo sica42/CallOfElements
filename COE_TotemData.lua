@@ -10,6 +10,21 @@
 
 ]]
 
+---@class COE
+---@field CreateTotem fun( self: COE): Totem
+---@field CreateTotemRank fun( self: COE): TotemRank
+---@field ElementFromTool fun( self: COE, element: TotemElement): string?
+---@field LocalizedElement fun( self: COE, element: string): TotemElement?
+---@field ScanTotems fun( self: COE)
+---@field GetTotemDurationAndHealth fun( self:COE, spellid: number): duration:number, health:number, cooldown:number
+---@field IsToolPresent fun( self:COE, spellid: number): boolean
+---@field IsTrinketPresent fun( self:COE): isTrinket: boolean, slot: number?
+---@field ReorderNewTotems fun( self: COE)
+---@field InitTotemSets fun( self: COE)
+---@field Fix_CastOrderLocalization fun( self: COE)
+---@field Fix_DisplayedTotems fun( self: COE)
+---@field Fix_CastOrderLocalization2 fun( self: COE)
+
 ---@class TotemRanks
 ---@field SpellID number
 ---@field Mana number
@@ -30,6 +45,7 @@
 ---@field CurHealth number
 ---@field CurCooldown number
 ---@field isTrinket boolean?
+---@field isBuff boolean?
 ---@field TrinketSlot number?
 ---@field Tick number?
 ---@field ticks boolean?
@@ -41,6 +57,11 @@
 ---@field Totem Totem?
 ---@field UseRank number?
 ---@field Timeout number
+
+---@class CleansingTotem
+---@field Totem Totem|nil
+---@field Button Button|nil
+---@field Warn boolean
 
 ---@alias TotemElement
 ---| "Earth"
@@ -72,13 +93,14 @@
 ---@field Water Totem|nil
 ---@field Air Totem|nil
 
+
 --[[ ----------------------------------------------------------------
 	COE.TotemData contains a list of totem classes that are
 	returned by COE:CreateTotem
 	For every available totem the player has, one object is
 	added to this list
 -------------------------------------------------------------------]]
----@type table<number, Totem>
+-----@type table<number, Totem>
 COE[ "TotemData" ] = {};
 COE[ "TotemCount" ] = 0;
 
@@ -151,15 +173,13 @@ COE[ "TotemSets" ] = {}
 	COE.SetCycle stores which totem of the active set have
 	already been thrown
 -------------------------------------------------------------------]]
----@type SetCycle
 COE[ "SetCycle" ] = { Earth = nil, Fire = nil, Water = nil, Air = nil };
 
 
 --[[ ----------------------------------------------------------------
 	COE.NoTotem is a placeholder for an empty anchor button
 -------------------------------------------------------------------]]
----@type Totem
-COE[ "NoTotem" ] = {
+COE.NoTotem = {
 	SpellName = "",
 	Element = "",
 	Texture = "Interface\\Icons\\INV_Misc_Idol_03.blp",
@@ -191,7 +211,6 @@ COE.TotemTicks[ COESTR_TOTEMWINDFURY ] = 10;
 
 	PURPOSE: Returns the totem class for a new totem
 -------------------------------------------------------------------]]
----@return Totem
 function COE:CreateTotem()
 	return {
 		SpellName = "",
@@ -228,7 +247,6 @@ end
 		This is needed for the french version to work. In the
 		english and german versions it just returns the input
 -------------------------------------------------------------------]]
----@param element TotemElement
 function COE:ElementFromTool( element )
 	if element == COESTR_TOTEMTOOLS_EARTH then
 		return COESTR_ELEMENT_EARTH;
@@ -246,8 +264,6 @@ end
 
 	PURPOSE: Translates a localized element name into english
 -------------------------------------------------------------------]]
----@param element string
----@return TotemElement?
 function COE:LocalizedElement( element )
 	if (element == COESTR_ELEMENT_EARTH) then
 		return "Earth";
@@ -347,7 +363,7 @@ function COE:ScanTotems()
 
 						-- translate element to english
 						-- -----------------------------
-						element = COE:LocalizedElement( element );
+						element = COE:LocalizedElement( assert( element ) );
 
 						-- valid element?
 						-- ---------------
@@ -398,7 +414,7 @@ function COE:ScanTotems()
 			if (text and text:GetText()) then
 				local _, _, mana = string.find( text:GetText(), COESTR_TOTEMMANA );
 				if (mana) then
-					totemrank.Mana = tonumber( mana );
+					totemrank.Mana = tonumber( mana ) or 0
 				end
 			end
 
@@ -515,10 +531,6 @@ end
 		totem duration then
 		Also the health and the cooldown of the totem are returned
 -------------------------------------------------------------------]]
----@param spellid number
----@return number duration
----@return number health
----@return number cooldown
 function COE:GetTotemDurationAndHealth( spellid )
 	COETotemTTTextRight3:SetText( nil );
 	COETotemTT:SetSpell( spellid, BOOKTYPE_SPELL );
@@ -617,8 +629,6 @@ end
 		This is done by testing the color of the "Tools:" section
 		in the totem tooltip
 -------------------------------------------------------------------]]
----@param spellid number
----@return boolean
 function COE:IsToolPresent( spellid )
 	-- get totem tooltip
 	-- ------------------
@@ -650,8 +660,6 @@ end
 
 	RETURNS: equipped, slot
 -------------------------------------------------------------------]]
----@return boolean isTrinket
----@return number? slot
 function COE:IsTrinketPresent()
 	for i = 0, 1 do
 		local slot = GetInventorySlotInfo( "Trinket" .. i .. "Slot" );

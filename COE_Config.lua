@@ -10,9 +10,46 @@
 
 ]]
 
-if (not COE_Config) then
-	COE_Config = {};
-end
+---@class COE_Config
+---@field Defaults table<number, any>
+---@field CurrentPanel string
+---@field CurrentSubPanel string
+---@field ConfigureOrderTotem boolean
+-- Interface
+---@field OnFrameLoad fun( self: COE_Config )
+---@field CloseDialog fun( self: COE_Config )
+---@field OnTabButtonClick fun( self: COE_Config )
+---@field OnConfigElementLoad fun( self: COE_Config, element: FontString )
+---@field OnConfigElementEnter fun( self: COE_Config )
+---@field OnConfigElementLeave fun( self: COE_Config )
+---@field OnSubTabButtonClick fun( self: COE_Config, button: Button )
+---@field OnCheckBoxShow fun( self: COE_Config )
+---@field OnCheckBoxClick fun( self: COE_Config )
+---@field EnableCheckBox fun( self: COE_Config, element: CheckButton )
+---@field DisableCheckBox fun( self: COE_Config, element: CheckButton )
+---@field OnComboBoxShow fun( self: COE_Config )
+---@field EnableComboBox fun( self: COE_Config, element: Frame )
+---@field DisableComboBox fun( self: COE_Config, element: Frame )
+---@field OnSliderShow fun( self: COE_Config )
+---@field OnSliderChange fun( self: COE_Config )
+---@field ConfigureBar fun( self: COE_Config, mode: boolean )
+---@field ConfigureOrder fun( self: COE_Config, mode: boolean )
+-- Totem Sets
+---@field ActivateSet fun( self: COE_Config, index: number )
+---@field SetSetButtonStates fun( self: COE_Config )
+---@field NewSetTextChanged fun( self: COE_Config )
+---@field NewTotemSet fun( self: COE_Config )
+---@field DeleteTotemSet fun( self: COE_Config )
+---@field ConfigureSet fun( self: COE_Config, mode: boolean )
+---@field DoCastOrder fun( self: COE_Config, up: boolean )
+-- Logic
+---@field RegisterOption fun( self: COE_Config, id: number, type: string, func: fun()|nil, value: any, initfunc: fun(), istotembaroption: boolean? )
+---@field SetOption fun( self: COE_Config, id: number, value: any )
+---@field GetSaved fun( self: COE_Config, id: number ): any
+
+
+---@type COE_Config
+COE_Config = COE_Config or {}
 
 
 --[[ ----------------------------------------------------------------
@@ -251,7 +288,7 @@ COE_DisplayedTotems = {};
 --[[ ----------------------------------------------------------------
 	COE_TotemBars stores the alignment options of the totem bars
 -------------------------------------------------------------------]]
----@type table<string, COE_TotemBars>
+---@type table<string, COE_TotemBar>
 COE_TotemBars = {
 	Earth = { Direction = "Left", Mode = "Flex", FlexCount = 1 },
 	Fire = { Direction = "Right", Mode = "Flex", FlexCount = 1 },

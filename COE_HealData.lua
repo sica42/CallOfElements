@@ -8,6 +8,20 @@
 	Healing Module Data
 ]]
 
+---@class COE
+---@field HealData table<string, table<number, HealingSpell>>
+---@field CreateHealingSpell fun( self: COE ): HealingSpell
+---@field ScanHealingSpells fun( self: COE )
+---@field LocalizedSpell fun( self: COE, spellname: string ): string
+
+---@class HealingSpell
+---@field SpellID number
+---@field Type string
+---@field Rank number
+---@field Mana number
+---@field MinAmount number
+---@field MaxAmount number
+---@field AvgAmount number
 
 --[[ ----------------------------------------------------------------
 	COE.HealData contains a list of all heal spells that the
@@ -119,7 +133,7 @@ function COE:ScanHealingSpells()
 			local text = COETotemTTTextLeft2:GetText();
 			local _, _, value = string.find( text, COESTR_TOTEMMANA );
 			if (value) then
-				heal.Mana = tonumber( value );
+				heal.Mana = assert( tonumber( value ) );
 			else
 				valid = false;
 			end
@@ -127,14 +141,14 @@ function COE:ScanHealingSpells()
 			text = COETotemTTTextLeft4:GetText();
 			_, _, value = string.find( text, COESTR_MINAMOUNT );
 			if (value) then
-				heal.MinAmount = tonumber( value );
+				heal.MinAmount = assert( tonumber( value ) );
 			else
 				valid = false;
 			end
 
 			_, _, value = string.find( text, COESTR_MAXAMOUNT );
 			if (value) then
-				heal.MaxAmount = tonumber( value );
+				heal.MaxAmount = assert( tonumber( value ) );
 			else
 				valid = false;
 			end

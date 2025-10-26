@@ -15,12 +15,12 @@
 ---@field Static boolean
 ---@field Dynamic boolean
 
----@class COE_TotemBars
+---@class COE_TotemBar
 ---@field Direction TotemBarDirection
 ---@field Mode TotemBarMode
 ---@field FlexCount number
 
----@class COE_Totem: CheckButton, COE_TotemBars
+---@class COE_Totem: CheckButton, COE_TotemBar
 ---@field totem Totem
 ---@field Updates Updates
 ---@field Point string
@@ -41,28 +41,7 @@
 ---@field AnchorTotem COE_Totem
 ---@field ElementFrame COE_Totem
 ---@field DropdownFrame Frame
----@field DropdownMenu fun( self: COE_Totem )
----@field DropdownMenuInitialize fun( self: COE_Totem )
 ---@field SetFrameDirection fun( self: COE_Totem, frame: COE_Totem, direction: TotemBarDirection )
----@field InitFrame fun( self: COE_Totem )
----@field InitMainFrame fun( self: COE_Totem )
----@field InitTimerFrame fun( self: COE_Totem )
----@field InitTotemicRecall fun( self: COE_Totem )
----@field UpdateTotemicRecall fun( self: COE_Totem, elapsed: number )
----@field CastTotemicRecall fun( self: COE_Totem )
----@field OnFrameEvent fun( self: COE_Totem, event: Event )
----@field OnTotemButtonLoad fun( self: COE_Totem )
----@field OnTotemButtonEvent fun( self: COE_Totem, event: Event )
----@field OnEnterTotemButton fun( self: COE_Totem )
----@field OnLeaveTotemButton fun( self: COE_Totem )
----@field OnTotemButtonClick fun( self: COE_Totem )
----@field ButtonStartDrag fun( self: COE_Totem )
----@field ButtonStopDrag fun( self: COE_Totem )
----@field OnMainFrameEvent fun( self: COE_Totem, event: Event )
----@field ResetFrames fun( self: COE_Totem )
----@field AdjustDraggedFrames fun( self: COE_Totem )
----@field ConfigureTotemButtons fun( self: COE_Totem )
----@field Invalidate fun( self: COE_Totem, frame: COE_Totem, Anchor: boolean, Static: boolean, Dynamic: boolean )
 ---@field GetSetIndex fun( self: COE_Totem, name: string ): number?, boolean?
 ---@field SwitchToSet fun( self: COE_Totem, name: string )
 ---@field SwitchNamedSet fun( self: COE_Totem ): boolean
@@ -70,12 +49,10 @@
 ---@field SwitchToNextSet fun( self: COE_Totem )
 ---@field SwitchToPriorSet fun( self: COE_Totem )
 ---@field SetPendingTotem fun(self: COE_Totem, totem: Totem?, rank: number? )
----@field SetTimerText fun( self: COE_Totem )
 ---@field ActivatePendingTotem fun( self: COE_Totem, totem: Totem )
 ---@field ThrowSet fun( self: COE_Totem, set: string, forces: boolean )
 ---@field ThrowAdvisedTotem fun( self: COE_Totem )
 ---@field ThrowTotem fun(self: COE_Totem, element: TotemElement, id: number )
----@field MakeAnchorTotem fun(self: COE_Totem, button: table )
 ---@field RankModifierDown fun( self: COE_Totem ): boolean
 ---@field ResetSetCycle fun( self: COE_Totem )
 ---@field ResetTimers fun( self: COE_Totem )
@@ -93,23 +70,12 @@
 ---@field HookCastSpell fun( self: COE_Totem, id: number )
 ---@field HookCastSpellByName fun( self: COE_Totem, SpellName: string )
 ---@field HookUseInventoryItem fun( self: COE_Totem, slotid: number )
----@field UpdateAllFrames fun( self: COE_Totem )
----@field UpdateFrame fun( self: COE_Totem, elapsed: number )
----@field UpdateFrameCoordinates fun( self: COE_Totem )
----@field UpdateAnchorButton fun( self: COE_Totem )
----@field UpdateStatic fun( self: COE_Totem )
----@field UpdateDynamic fun( self: COE_Totem )
----@field UpdateTotemButton fun( self: COE_Totem, elapsed: number )
----@field UpdateTotemButtonCooldown fun( self: COE_Totem )
----@field UpdateTotemButtonIsUsable fun( self: COE_Totem )
----@field UpdateTotemButtonHotKey fun( self: COE_Totem )
----@field UpdateTotemButtonFlash fun( self: COE_Totem, elapsed: number )
----@field UpdateTimerFrame fun( self: COE_Totem, elapsed: number )
+
+---@type COE_Totem
 COE_Totem = COE_Totem or {}
-local COE_Totem = COE_Totem
 
 function COE_Totem:OutOfRange( unit1, unit2, distance )
-	if not (COE.has_superwow and UnitExists( unit1 ) and UnitExists( unit2 ) and UnitCanAssist( unit1, unit2 )) then
+	if not (COE.hasSuperwow and UnitExists( unit1 ) and UnitExists( unit2 ) and UnitCanAssist( unit1, unit2 )) then
 		return false
 	end
 
@@ -212,7 +178,7 @@ end
 	PURPOSE: If the totem warning is still active, a notification
 		is displayed and the function rescheduled
 -------------------------------------------------------------------]]
----@param totem Totem
+---@param totem CleansingTotem
 ---@param msg string
 function COESched_AdviseTotem( totem, msg )
 	if (COE_Config:GetSaved( COEOPT_ADVISOR ) == 1 and totem.Warn) then
@@ -1288,7 +1254,6 @@ function COE_Totem:HookUseInventoryItem( slotid )
 
 	-- iterate through out totems and find the trinket totem
 	-- ------------------------------------------------------
-	local i;
 	for i = 1, COE.TotemCount do
 		if (COE.TotemData[ i ].isTrinket) then
 			-- does the totem have the same slot id?
