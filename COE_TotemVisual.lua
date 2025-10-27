@@ -1584,6 +1584,9 @@ function COE_Totem:OnTotemButtonClick()
 		-- ----------------------------------------------------------
 		if (IsControlKeyDown()) then
 			COE_Totem:MakeAnchorTotem( this );
+			if (COE_Config:GetSaved( COEOPT_CTRLCLICKMOVE ) == 1) then
+				return
+			end
 		end
 
 		if (this.totem.isTrinket) then

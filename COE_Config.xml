@@ -150,6 +150,16 @@
 									</Anchor>
 								</Anchors>
 							</CheckButton>
+							<CheckButton name="COE_OptionCtrlClick" inherits="COE_ConfigCheckButtonTemplate" id="31">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionEnableRecallButton" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</CheckButton>
+
 							<Button name="COE_OptionTTAlignment" inherits="COE_ConfigComboBoxTemplate" id="5">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativeTo="COE_OptionGroupBars" relativePoint="BOTTOMLEFT">
