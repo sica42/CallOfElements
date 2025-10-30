@@ -52,6 +52,9 @@
 ---@type COE_Totem
 COE_Totem = COE_Totem or {}
 
+---@type COE
+local COE = COE
+
 COEUI_BUTTONGAP = 4;
 
 COE_Totem.FlexTime = 0.3;
@@ -150,7 +153,7 @@ function COE_Totem:OnMainFrameEvent( event )
 
 		-- start weapon check schedule
 		-- ----------------------------
-		if (COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONS ) == 1) then
+		if (COE_Config:GetSaved( COEOPT_WEAPONNOTIFICATION ) == 1) then
 			Chronos.scheduleByName( "COEWeaponCheck", COE.WeaponCheckInterval, COESched_RunWeaponCheck )
 		end
 
@@ -174,7 +177,7 @@ function COE_Totem:OnMainFrameEvent( event )
 			COE_Totem:SwitchPVPSet();
 		end
 	elseif (event == "PLAYER_AURAS_CHANGED") then
-		if COE.hasSuperwow and COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 0 then
+		if COE.hasSuperwow and COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATION ) == 0 then
 			return
 		end
 
@@ -184,8 +187,9 @@ function COE_Totem:OnMainFrameEvent( event )
 			local buffId, _ = GetPlayerBuff( i, "HELPFUL|HARMFUL|PASSIVE" )
 			if buffId >= 0 then
 				local texture = GetPlayerBuffTexture( buffId )
+				local count = GetPlayerBuffApplications( buffId )
 				if texture then
-					playerBuffs[ texture ] = true
+					playerBuffs[ texture ] = count
 				end
 			else
 				break
@@ -205,19 +209,45 @@ function COE_Totem:OnMainFrameEvent( event )
 			end
 		end
 
-		if COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 1 then
+		if COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATION ) == 1 then
 			local currentShield
+			local currentShieldCharges = 0
+
 			for shield, texture in pairs( COE.Shields ) do
 				if playerBuffs[ texture ] then
-					currentShield = texture
+					currentShieldCharges = playerBuffs[ texture ]
+					currentShield = shield
 					COE.activeShield = shield
+					break
 				end
 			end
-			if not currentShield and COE.activeShield then
-				COE:Notification( string.format( COESTR_SHIELD, COE.activeShield ), COECOL_TOTEMDESTROYED,
-					COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ) == 1
-				)
-				COE.activeShield = nil
+
+			local warnCharges = COE_Config:GetSaved( COEOPT_SHIELDCHARGES )
+
+			if currentShieldCharges and (not COE.shieldWarning or COE.shieldWarning and COE.shieldWarning ~= currentShieldCharges) and currentShieldCharges > warnCharges then
+				COE.shieldWarning = currentShieldCharges
+				COE:HideNotificationIcon( COE.Shields[ COE.activeShield ] )
+			end
+
+			if COE.activeShield then
+				if not currentShield then
+					COE:Notification(
+						string.format( COESTR_SHIELD, COE.activeShield ),
+						COECOL_TOTEMWARNING,
+						COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATIONSOUND ),
+						COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATIONICON ) == 1 and COE.Shields[ COE.activeShield ] or nil
+					)
+					COE.activeShield = nil
+					COE.shieldWarning = nil
+				elseif currentShieldCharges and (not COE.shieldWarning or COE.shieldWarning > currentShieldCharges) and warnCharges > 0 and currentShieldCharges <= warnCharges then
+					COE:Notification(
+						string.format( COESTR_SHIELDCHARGES, COE.activeShield, currentShieldCharges ),
+						COECOL_TOTEMWARNING,
+						COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATIONSOUND ),
+						COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATIONICON ) == 1 and COE.Shields[ COE.activeShield ] or nil
+					)
+					COE.shieldWarning = currentShieldCharges
+				end
 			end
 		end
 	elseif (event == "PLAYER_DEAD") then

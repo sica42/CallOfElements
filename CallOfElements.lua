@@ -8,6 +8,10 @@
 							by Sica(2025-)
 ]]
 
+---@class NotificationIcon: Frame
+---@field state "SHOW"|"HOLD"|"HIDE"|"DONE"|"CONFIG"
+---@field elapsedTime number
+
 ---@class TotemRank
 ---@field SpellID number
 ---@field Mana number
@@ -16,6 +20,8 @@
 ---@field Cooldown number
 
 ---@class COE
+---@field name string
+---@field pfUISkinEnabled boolean
 ---@field Initialized boolean
 ---@field hasSuperwow boolean
 ---@field DebugMode boolean
@@ -33,6 +39,7 @@
 ---@field WeaponCurrent string|nil
 ---@field Shields table<string, string>
 ---@field activeShield string|nil
+---@field shieldWarning integer|nil
 ---@field LastActiveSet string
 ---@field ActiveTotems table<TotemElement, Totem>
 ---@field MaxTotems table<TotemElement, number>
@@ -51,7 +58,10 @@
 ---@field OnEvent fun( self: COE, event: string )
 ---@field Message fun( self: COE, msg: string )
 ---@field DebugMessage fun( self: COE, msg: string )
----@field Notification fun( self: COE, msg: string, color: number, alarm: boolean? )
+---@field Notification fun( self: COE, msg: string, color: number, alarm: integer?, icon: string? )
+---@field ShowNotificationIcon fun( self: COE, texture: string, configMode: boolean? )
+---@field HideNotificationIcon fun( self: COE, texture: string? )
+---@field UpdateNotificationIcon fun( self: COE, elapsed: number )
 ---@field ToggleConfigFrame fun( self: COE )
 ---@field DisplayShellCommands fun( self: COE )
 ---@field FixSavedVariables fun( self: COE )
@@ -61,8 +71,9 @@ COE = COE or {}
 
 ---@diagnostic disable-next-line: undefined-global
 COE.hasSuperwow = SetAutoloot and true or false
+COE.name = "CallOfElements"
 
-COE_VERSION = GetAddOnMetadata( "CallOfElements", "Version" )
+COE_VERSION = GetAddOnMetadata( COE.name, "Version" )
 
 COECOL_TOTEMWARNING = 1;
 COECOL_TOTEMDESTROYED = 2;
@@ -108,12 +119,11 @@ function COE:Init()
 	-- ----------------------
 	local _, EnglishClass = UnitClass( "player" );
 	if (EnglishClass ~= "SHAMAN") then
-		COE:Message( COESTR_NOTASHAMAN );
 		COE.Initialized = false;
 	else
 		COE.Initialized = true;
-		COE:Message( "Call of Elements v" .. COE_VERSION .. " mod CFM /coe" );
 		this:RegisterEvent( "VARIABLES_LOADED" );
+		this:RegisterEvent( "PLAYER_LOGIN")
 		if COE.hasSuperwow then
 			this:RegisterEvent( "UNIT_MODEL_CHANGED" );
 		end
@@ -149,6 +159,24 @@ function COE:OnEvent( event )
 				end
 			end
 		end
+	elseif event == "PLAYER_LOGIN" then
+		if COE.Initialized then
+			COE:Message( "Call of Elements v" .. COE_VERSION .. " /coe" );
+		else
+			COE:Message( COESTR_NOTASHAMAN );
+		end
+
+		if IsAddOnLoaded( "pfUI" ) and pfUI and pfUI.api and pfUI.env and pfUI.env.C then
+			COE.pfUISkinEnabled = true
+			pfUI:RegisterSkin( COE.name, "vanilla", function()
+				if pfUI.env.C.disabled and pfUI.env.C.disabled[ "skin_RaidCalendar" ] == "1" then
+					COE.pfUISkinEnabled = false
+				end
+			end )
+		end
+		if COE.pfUISkinEnabled then
+			COE_Config:pfUISkin()
+		end
 	end
 end
 
@@ -179,7 +207,7 @@ end;
 	PURPOSE: Adds a message to the error frame in the upper
 		screen center
 -------------------------------------------------------------------]]
-function COE:Notification( msg, color, alarm )
+function COE:Notification( msg, color, alarm, icon )
 	local col;
 
 	-- choose color
@@ -200,10 +228,111 @@ function COE:Notification( msg, color, alarm )
 
 	-- play alarm sound
 	-- -----------------
-	if (alarm) then
-		PlaySoundFile( "Interface\\AddOns\\CallOfElements\\Assets\\Alarm.wav" );
+	if alarm and alarm > 1 then
+		PlaySoundFile( COE.Sounds[ alarm ].File );
+	end
+
+	-- show icon
+	-- ----------
+	if icon then
+		COE:ShowNotificationIcon( icon );
 	end
 end;
+
+--[[ ----------------------------------------------------------------
+	METHOD: ShowNotificationIcon
+
+	PURPOSE: Shows the notification icon
+-------------------------------------------------------------------]]
+function COE:ShowNotificationIcon( texture, configMode )
+	---@type NotificationIcon
+	local frame = getglobal( "COENotificationIconFrame" )
+
+	---@type Texture
+	local icon = getglobal( "COENotificationIconFrameIcon" )
+
+	if frame and icon then
+		if (frame.state == "HOLD" or frame.state == "SHOW") and icon:GetTexture() == texture and not configMode then
+			return
+		end
+		local size = COE_Config:GetSaved( COEOPT_NOTIFYICONSIZE )
+		icon:SetTexture( texture )
+		frame:SetWidth( size )
+		frame:SetHeight( size )
+		frame:SetPoint( "Center", UIParent, "Center", 0, 280 - (size/2) )
+		frame.elapsedTime = 0
+
+		if configMode then
+			frame:SetAlpha( COE_Config:GetSaved( COEOPT_NOTIFYICONALPHA ) )
+			frame:SetScale( 1 )
+			frame.state = "CONFIG"
+		else
+			frame.state = "SHOW"
+		end
+
+		frame:Show()
+	end
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: HideNotificationIcon
+
+	PURPOSE: Hides the notification icon
+-------------------------------------------------------------------]]
+function COE:HideNotificationIcon( texture)
+	---@type NotificationIcon
+	local frame = getglobal( "COENotificationIconFrame" )
+	---@type Texture
+	local icon = getglobal( "COENotificationIconFrameIcon" )
+
+	if frame and frame.state ~= "DONE" then
+		if not texture or texture == icon:GetTexture() then
+			frame.elapsedTime = 0
+			frame.state = "HIDE"
+		end
+	end
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: UpdateNotificationIcon
+
+	PURPOSE: Update event for the notification icon
+-------------------------------------------------------------------]]
+function COE:UpdateNotificationIcon( elapsed )
+	---@type NotificationIcon
+	local frame = getglobal( "COENotificationIconFrame" )
+	local iconAlpha = COE_Config:GetSaved( COEOPT_NOTIFYICONALPHA )
+	frame.elapsedTime = frame.elapsedTime + elapsed
+
+	if frame.state == "SHOW" then
+		local scale = frame.elapsedTime / 0.4
+		local alpha = iconAlpha * (frame.elapsedTime / 0.4)
+
+		if scale >= 1 then
+			scale = 1
+			alpha = iconAlpha
+			frame.state = "HOLD"
+		end
+		frame:SetScale( scale )
+		frame:SetAlpha( math.min( alpha, iconAlpha ) )
+	elseif frame.state == "HOLD" then
+		if frame.elapsedTime >= COE_Config:GetSaved( COEOPT_NOTIFYICONDURATION ) then
+			frame.elapsedTime = 0
+			frame.state = "HIDE"
+		end
+	elseif frame.state == "HIDE" then
+		local scale = 1 + (0-1) * (frame.elapsedTime / 0.4)
+		local alpha = iconAlpha + (0 - iconAlpha) * (frame.elapsedTime / 0.4)
+		if alpha <= 0 then
+			alpha = 0
+			scale = 0
+			frame.state = "DONE"
+			frame:Hide()
+		end
+		frame:SetScale( scale )
+		frame:SetAlpha( alpha )
+	end
+end
 
 --[[ ----------------------------------------------------------------
 	METHOD: COE:ToggleConfigFrame

@@ -4,7 +4,7 @@
 	<!-- config panel template -->
 	<Frame name="COE_ConfigPanelTemplate" virtual="true">
 		<Size>
-			<AbsDimension x="360" y="440"/>
+			<AbsDimension x="426" y="440"/>
 		</Size>
 		<Backdrop name="$parentBackdrop" bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
 			<EdgeSize>

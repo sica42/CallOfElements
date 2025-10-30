@@ -54,11 +54,11 @@
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY">
-				<FontString name="$parentText" inherits="GameFontNormalLarge" text="">
+				<FontString name="$parentText" inherits="GameFontNormal" text="">
 					<Anchors>
 						<Anchor point="CENTER">
 							<Offset>
-								<AbsDimension x="0" y="-13"/>
+								<AbsDimension x="0" y="-10"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -277,6 +277,28 @@
 		</Frames>
 	</Frame>
 
+	<!-- Notification icon -->
+	<Frame name="COENotificationIconFrame" frameStrata="LOW" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="96" y="96" />
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon">
+					<Anchors>
+						<Anchor point="TOPLEFT"/>
+          				<Anchor point="BOTTOMRIGHT"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnUpdate>
+				COE:UpdateNotificationIcon( arg1 );
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
 	<!-- Totem MainFrame -->
 	<Frame name="COETotemFrame" frameStrata="LOW" hidden="true" parent="UIParent">
 		<Scripts>
@@ -315,6 +337,4 @@
 			<CheckButton name="COETimerAir" inherits="COETotemButtonTemplate" hidden="true" id="4"/>
 		</Frames>
 	</Frame>
-	
-	
 </Ui>

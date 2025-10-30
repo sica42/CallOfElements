@@ -161,6 +161,21 @@ COE[ "Shields" ] = {
 	Water = "Interface\\Icons\\Ability_Shaman_WaterShield"
 }
 
+COE[ "WeaponEnchants" ] = {
+	[ 1 ] = { Name = COESTR_WEAPON_ROCKBITER, Icon = "Interface\\Icons\\Spell_Nature_Rockbiter" },
+	[ 2 ] = { Name = COESTR_WEAPON_FLAMETONGUE, Icon = "Interface\\Icons\\Spell_Fire_Flametounge" },
+	[ 3 ] = { Name = COESTR_WEAPON_FROSTBRAND, Icon = "Interface\\Icons\\Spell_Frost_Frostbrand" },
+	[ 4 ] = { Name = COESTR_WEAPON_WINDFURY, Icon = "Interface\\Icons\\Spell_Nature_Cyclone" }
+}
+
+COE[ "Sounds" ] = {
+	[ 1 ] = { Name = "No alarm", File = "" },
+	[ 2 ] = { Name = "Alarm 1", File = "Interface\\AddOns\\CallOfElements\\Assets\\Alarm1.wav" },
+	[ 3 ] = { Name = "Alarm 2", File = "Interface\\AddOns\\CallOfElements\\Assets\\Alarm2.wav" },
+	[ 4 ] = { Name = "Alarm 3", File = "Interface\\AddOns\\CallOfElements\\Assets\\Alarm3.wav" },
+	[ 5 ] = { Name = "Warning", File = "Interface\\AddOns\\CallOfElements\\Assets\\Warning.wav" },
+}
+
 --[[ ----------------------------------------------------------------
 	COE.TotemSets contains the totem pointers for each set and
 	element

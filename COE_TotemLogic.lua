@@ -184,8 +184,11 @@ function COESched_AdviseTotem( totem, msg )
 	if (COE_Config:GetSaved( COEOPT_ADVISOR ) == 1 and totem.Warn) then
 		-- issue warning
 		-- --------------
-		COE:Notification( string.format( COESTR_CLEANSINGTOTEM, msg ), COECOL_TOTEMCLEANSING,
-			COE_Config:GetSaved( COEOPT_ADVISORSOUND ) == 1
+		COE:Notification(
+			string.format( COESTR_CLEANSINGTOTEM, msg ),
+			COECOL_TOTEMCLEANSING,
+			COE_Config:GetSaved( COEOPT_ADVISORSOUND ),
+			COE_Config:GetSaved( COEOPT_ADVISORICON ) == 1 and totem.Totem.Texture or nil
 		);
 
 		-- reschedule
@@ -319,7 +322,11 @@ end
 		notifies the player if it has faded
 -------------------------------------------------------------------]]
 function COESched_RunWeaponCheck()
-	local mainHand = GetWeaponEnchantInfo()
+	local mainHand, duration = GetWeaponEnchantInfo()
+
+	if duration and duration > 3599000 then
+		COE.WeaponEnchant = nil
+	end
 
 	if mainHand and not COE.WeaponEnchant then
 		COETotemTT:SetInventoryItem( "player", 16 )
@@ -329,13 +336,13 @@ function COESched_RunWeaponCheck()
 			local line = getglobal( "COETotemTTTextLeft" .. i ):GetText()
 
 			if string.find( line, COESTR_WEAPON_ROCKBITER ) then
-				COE.WeaponEnchant = COESTR_WEAPON_ROCKBITER
+				COE.WeaponEnchant = 1
 			elseif string.find( line, COESTR_WEAPON_FLAMETONGUE ) then
-				COE.WeaponEnchant = COESTR_WEAPON_FLAMETONGUE
+				COE.WeaponEnchant = 2
 			elseif string.find( line, COESTR_WEAPON_FROSTBRAND ) then
-				COE.WeaponEnchant = COESTR_WEAPON_FROSTBRAND
+				COE.WeaponEnchant = 3
 			elseif string.find( line, COESTR_WEAPON_WINDFURY ) then
-				COE.WeaponEnchant = COESTR_WEAPON_WINDFURY
+				COE.WeaponEnchant = 4
 			end
 
 			if COE.WeaponEnchant then
@@ -346,8 +353,11 @@ function COESched_RunWeaponCheck()
 	elseif not mainHand and COE.WeaponEnchant then
 		-- No weapon enchant, make sure it's the same weapon as before and warn if so
 		if COE.WeaponCurrent == GetInventoryItemLink( "player", 16 ) then
-			COE:Notification( string.format( COESTR_WEAPON, COE.WeaponEnchant ), COECOL_TOTEMDESTROYED,
-				COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND ) == 1
+			COE:Notification(
+				string.format( COESTR_WEAPON, COE.WeaponEnchants[ COE.WeaponEnchant ].Name ),
+				COECOL_TOTEMDESTROYED,
+				COE_Config:GetSaved( COEOPT_WEAPONNOTIFICATIONSOUND ),
+				COE_Config:GetSaved( COEOPT_WEAPONNOTIFICATIONICON) and COE.WeaponEnchants[ COE.WeaponEnchant ].Icon or nil
 			)
 		end
 		COE.WeaponEnchant = nil
@@ -425,16 +435,19 @@ function COE_Totem:ThrowAdvisedTotem()
 					COE.CleansingTotems.Tremor.Totem.OutOfRange or
 					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Tremor.Totem.SpellName );
+		COE:HideNotificationIcon( COE.CleansingTotems.Tremor.Totem.Texture )
 	elseif (COE.CleansingTotems.Disease.Warn and
 				(COE.ActiveTotems.Water ~= COE.CleansingTotems.Disease.Totem or
 					COE.CleansingTotems.Disease.Totem.OutOfRange or
 					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Disease.Totem.SpellName );
+		COE:HideNotificationIcon( COE.CleansingTotems.Disease.Totem.Texture )
 	elseif (COE.CleansingTotems.Poison.Warn and
 				(COE.ActiveTotems.Water ~= COE.CleansingTotems.Poison.Totem or
 					COE.CleansingTotems.Poison.Totem.OutOfRange or
 					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Poison.Totem.SpellName );
+		COE:HideNotificationIcon( COE.CleansingTotems.Poison.Totem.Texture )
 	end
 end
 

@@ -30,6 +30,8 @@
 ---@field OnComboBoxShow fun( self: COE_Config )
 ---@field EnableComboBox fun( self: COE_Config, element: Frame )
 ---@field DisableComboBox fun( self: COE_Config, element: Frame )
+---@field EnableEditBox fun( self: COE_Config, element: EditBox )
+---@field DisableEditBox fun( self: COE_Config, element: EditBox )
 ---@field OnSliderShow fun( self: COE_Config )
 ---@field OnSliderChange fun( self: COE_Config )
 ---@field ConfigureBar fun( self: COE_Config, mode: boolean )
@@ -46,7 +48,7 @@
 ---@field RegisterOption fun( self: COE_Config, id: number, type: string, func: fun()|nil, value: any, initfunc: fun(), istotembaroption: boolean? )
 ---@field SetOption fun( self: COE_Config, id: number, value: any )
 ---@field GetSaved fun( self: COE_Config, id: number ): any
-
+---@field pfUISkin fun( self: COE_Config )
 
 ---@type COE_Config
 COE_Config = COE_Config or {}
@@ -97,12 +99,19 @@ COEOPT_GROUPBARS = 22;
 COEOPT_FRAMETIMERSONLY = 23;
 COEOPT_ENABLERECALLREMINDER = 24;
 COEOPT_ENABLERECALLBUTTON = 25;
-COEOPT_ENABLESHIELDNOTIFICATIONS = 26;
-COEOPT_ENABLESHIELDNOTIFICATIONSSOUND = 27;
-COEOPT_ENABLEWEAPONNOTIFICATIONS = 28;
-COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND = 29;
+COEOPT_SHIELDNOTIFICATION = 26;
+COEOPT_SHIELDNOTIFICATIONSOUND = 27;
+COEOPT_SHIELDNOTIFICATIONICON = 32;
+COEOPT_SHIELDCHARGES = 35;
+COEOPT_WEAPONNOTIFICATION = 28;
+COEOPT_WEAPONNOTIFICATIONSOUND = 29;
+COEOPT_WEAPONNOTIFICATIONICON = 33;
 COEOPT_ADVISORSOUND = 30;
+COEOPT_ADVISORICON = 34;
 COEOPT_CTRLCLICKMOVE = 31;
+COEOPT_NOTIFYICONDURATION = 36;
+COEOPT_NOTIFYICONSIZE = 37;
+COEOPT_NOTIFYICONALPHA = 38;
 
 COEMODE_ALLTOTEMS = 1;
 COEMODE_TIMERSONLY = 2;
@@ -128,16 +137,20 @@ COE_Config.Defaults = {
 	[ COEOPT_ENABLERECALLBUTTON ] = 0,
 	[ COEOPT_CTRLCLICKMOVE ] = 0,
 	[ COEOPT_ENABLERECALLREMINDER ] = 0,
-	[ COEOPT_ENABLESHIELDNOTIFICATIONS ] = 0,
-	[ COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ] = 0,
-	[ COEOPT_ENABLEWEAPONNOTIFICATIONS ] = 0,
-	[ COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND ] = 0,
+	[ COEOPT_SHIELDNOTIFICATION ] = 0,
+	[ COEOPT_SHIELDNOTIFICATIONSOUND ] = 0,
+	[ COEOPT_SHIELDNOTIFICATIONICON ] = 0,
+	[ COEOPT_SHIELDCHARGES ] = 0,
+	[ COEOPT_WEAPONNOTIFICATION ] = 0,
+	[ COEOPT_WEAPONNOTIFICATIONSOUND ] = 0,
+	[ COEOPT_WEAPONNOTIFICATIONICON ] = 0,
 	[ COEOPT_TIMERNOTIFICATIONS ] = 1,
 	[ COEOPT_TTALIGNMENT ] = 2,
 	[ COEOPT_DISPLAYMODE ] = 1,
 	[ COEOPT_DISPLAYALIGN ] = 1,
 	[ COEOPT_ADVISOR ] = 1,
-	[ COEOPT_ADVISORSOUND ] = 0,
+	[ COEOPT_ADVISORSOUND ] = 1,
+	[ COEOPT_ADVISORICON ] = 0,
 	[ COEOPT_ENABLESETS ] = 1,
 	[ COEOPT_ENABLEFORCESETS ] = 0,
 	[ COEOPT_ENABLEDISTANCECHECK ] = 0,
@@ -151,6 +164,9 @@ COE_Config.Defaults = {
 	[ COEOPT_OVERRIDERANK ] = 1,
 	[ COEOPT_GROUPBARS ] = 0,
 	[ COEOPT_FRAMETIMERSONLY ] = 0,
+	[ COEOPT_NOTIFYICONDURATION ] = 5,
+	[ COEOPT_NOTIFYICONSIZE ] = 100,
+	[ COEOPT_NOTIFYICONALPHA ] = 0.8,
 }
 
 --[[ ----------------------------------------------------------------
@@ -163,16 +179,20 @@ COE_Saved = {
 	[ COEOPT_ENABLERECALLBUTTON ] = 0,
 	[ COEOPT_CTRLCLICKMOVE ] = 0,
 	[ COEOPT_ENABLERECALLREMINDER ] = 0,
-	[ COEOPT_ENABLESHIELDNOTIFICATIONS ] = 0,
-	[ COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ] = 0,
-	[ COEOPT_ENABLEWEAPONNOTIFICATIONS ] = 0,
-	[ COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND ] = 0,
+	[ COEOPT_SHIELDNOTIFICATION ] = 0,
+	[ COEOPT_SHIELDNOTIFICATIONSOUND ] = 0,
+	[ COEOPT_SHIELDNOTIFICATIONICON ] = 0,
+	[ COEOPT_SHIELDCHARGES ] = 0,
+	[ COEOPT_WEAPONNOTIFICATION ] = 0,
+	[ COEOPT_WEAPONNOTIFICATIONSOUND ] = 0,
+	[ COEOPT_WEAPONNOTIFICATIONICON ] = 0,
 	[ COEOPT_TIMERNOTIFICATIONS ] = 1,
 	[ COEOPT_TTALIGNMENT ] = 2,
 	[ COEOPT_DISPLAYMODE ] = 1,
 	[ COEOPT_DISPLAYALIGN ] = 1,
 	[ COEOPT_ADVISOR ] = 1,
-	[ COEOPT_ADVISORSOUND ] = 0,
+	[ COEOPT_ADVISORSOUND ] = 1,
+	[ COEOPT_ADVISORICON ] = 0,
 	[ COEOPT_ENABLESETS ] = 1,
 	[ COEOPT_ENABLEFORCESETS ] = 0,
 	[ COEOPT_ENABLEDISTANCECHECK ] = 0,
@@ -186,6 +206,9 @@ COE_Saved = {
 	[ COEOPT_OVERRIDERANK ] = 1,
 	[ COEOPT_GROUPBARS ] = 0,
 	[ COEOPT_FRAMETIMERSONLY ] = 0,
+	[ COEOPT_NOTIFYICONDURATION ] = 5,
+	[ COEOPT_NOTIFYICONSIZE ] = 100,
+	[ COEOPT_NOTIFYICONALPHA ] = 0.8,
 }
 
 
@@ -337,15 +360,22 @@ function COE_Config:OnFrameLoad()
 	COE_Config:RegisterOption( COEOPT_ENABLETIMERS, 'check', COEOptionEnableTimers, COE_Config:GetSaved( COEOPT_ENABLETIMERS ) );
 	COE_Config:RegisterOption( COEOPT_ENABLERECALLREMINDER, 'check', COEOptionEnableRecallReminder, COE_Config:GetSaved( COEOPT_ENABLERECALLREMINDER ) );
 	COE_Config:RegisterOption( COEOPT_CTRLCLICKMOVE, 'check', nil, COE_Config:GetSaved( COEOPT_CTRLCLICKMOVE ) );
-	COE_Config:RegisterOption( COEOPT_ENABLESHIELDNOTIFICATIONS, 'check', COEOptionShieldChange, COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) );
-	COE_Config:RegisterOption( COEOPT_ENABLESHIELDNOTIFICATIONSSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONSSOUND ) );
-	COE_Config:RegisterOption( COEOPT_ENABLEWEAPONNOTIFICATIONS, 'check', COEOptionWeaponChange, COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONS ) );
-	COE_Config:RegisterOption( COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONSSOUND ) );
+	COE_Config:RegisterOption( COEOPT_SHIELDNOTIFICATION, 'check', COEOptionShieldChange, COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATION ) );
+	COE_Config:RegisterOption( COEOPT_SHIELDNOTIFICATIONICON, 'check', nil, COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATIONICON ) );
+	COE_Config:RegisterOption( COEOPT_SHIELDNOTIFICATIONSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATIONSOUND ), COEOptionShieldSoundInit );
+	COE_Config:RegisterOption( COEOPT_SHIELDCHARGES, 'editbox', nil, COE_Config:GetSaved( COEOPT_SHIELDCHARGES ) );
+	COE_Config:RegisterOption( COEOPT_WEAPONNOTIFICATION, 'check', COEOptionWeaponChange, COE_Config:GetSaved( COEOPT_WEAPONNOTIFICATION ) );
+	COE_Config:RegisterOption( COEOPT_WEAPONNOTIFICATIONICON, 'check', nil, COE_Config:GetSaved( COEOPT_WEAPONNOTIFICATIONICON ) );
+	COE_Config:RegisterOption( COEOPT_WEAPONNOTIFICATIONSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_WEAPONNOTIFICATIONSOUND ), COEOptionWeaponSoundInit );
 	COE_Config:RegisterOption( COEOPT_TIMERNOTIFICATIONS, 'check', nil, COE_Config:GetSaved( COEOPT_TIMERNOTIFICATIONS ) );
+	COE_Config:RegisterOption( COEOPT_NOTIFYICONDURATION, 'slider', COEOptionNotifyIconDurationChange, COE_Config:GetSaved( COEOPT_NOTIFYICONDURATION ),	COEOptionNotifyIconDurationShow );
+	COE_Config:RegisterOption( COEOPT_NOTIFYICONSIZE, 'slider', COEOptionNotifyIconSizeChange, COE_Config:GetSaved( COEOPT_NOTIFYICONSIZE ), COEOptionNotifyIconSizeShow );
+	COE_Config:RegisterOption( COEOPT_NOTIFYICONALPHA, 'slider', COEOptionNotifyIconAlphaChange, COE_Config:GetSaved( COEOPT_NOTIFYICONSIZE ), COEOptionNotifyIconAlphaShow );
 	COE_Config:RegisterOption( COEOPT_TTALIGNMENT, 'combo', nil, COE_Config:GetSaved( COEOPT_TTALIGNMENT ), COEOptionTTAlignmentInit );
 	COE_Config:RegisterOption( COEOPT_DISPLAYMODE, 'combo', nil, COE_Config:GetSaved( COEOPT_DISPLAYMODE ), COEOptionDisplayModeInit );
 	COE_Config:RegisterOption( COEOPT_ADVISOR, 'check', COEOptionEnableAdvisor, COE_Config:GetSaved( COEOPT_ADVISOR ) );
-	COE_Config:RegisterOption( COEOPT_ADVISORSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_ADVISORSOUND ) );
+	COE_Config:RegisterOption( COEOPT_ADVISORICON, 'check', nil, COE_Config:GetSaved( COEOPT_ADVISORICON ) );
+	COE_Config:RegisterOption( COEOPT_ADVISORSOUND, 'check', nil, COE_Config:GetSaved( COEOPT_ADVISORSOUND ), COEOptionAdvisorSoundInit );
 	COE_Config:RegisterOption( COEOPT_ENABLESETS, 'check', COEOptionEnableSets, COE_Config:GetSaved( COEOPT_ENABLESETS ) );
 	COE_Config:RegisterOption( COEOPT_ENABLEFORCESETS, 'check', nil, COE_Config:GetSaved( COEOPT_ENABLEFORCESETS ) );
 	COE_Config:RegisterOption( COEOPT_ENABLEDISTANCECHECK, 'check', nil, COE_Config:GetSaved( COEOPT_ENABLEDISTANCECHECK ) );
@@ -364,9 +394,9 @@ function COE_Config:OnFrameLoad()
 	COE_Config:RegisterOption( COEOPT_ENABLERECALLBUTTON, 'check', COEOptionEnableRecallButton, COE_Config:GetSaved( COEOPT_ENABLERECALLBUTTON ) );
 	COE_Config:RegisterOption( COEOPT_FRAMETIMERSONLY, 'check', nil, COE_Config:GetSaved( COEOPT_FRAMETIMERSONLY ) );
 
-	COEOptionScaleCheckButton( getglobal( "COE_OptionAdvisorSound" ) )
-	COEOptionScaleCheckButton( getglobal( "COE_OptionEnableShieldNotificationsSound" ) )
-	COEOptionScaleCheckButton( getglobal( "COE_OptionEnableWeaponNotificationsSound" ) )
+	COEOptionScaleCheckButton( getglobal( "COE_OptionAdvisorIcon" ) )
+	COEOptionScaleCheckButton( getglobal( "COE_OptionWeaponIcon" ) )
+	COEOptionScaleCheckButton( getglobal( "COE_OptionShieldIcon" ) )
 end
 
 --[[ ----------------------------------------------------------------
@@ -378,6 +408,7 @@ function COE_Config:CloseDialog()
 	COE_Config:ConfigureBar( false );
 	COE_Config:ConfigureOrder( false );
 	COE_Config:ConfigureSet( false );
+	COE:HideNotificationIcon();
 	COE_ConfigFrame:Hide();
 end
 
@@ -559,7 +590,14 @@ end
 		normal text color
 -------------------------------------------------------------------]]
 function COE_Config:EnableComboBox( element )
-	getglobal( element:GetName() .. "CB" ):Show();
+	local cb = getglobal( element:GetName() .. "CB" )
+	cb:Enable()
+	cb:SetAlpha( 1.0 )
+	cb.EnableMouse = true
+
+	local btn = getglobal( cb:GetName() .. "Button" )
+	if btn and btn.Enable then btn:Enable() end
+
 	getglobal( element:GetName() .. "LeftText" ):SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b );
 end
 
@@ -569,8 +607,26 @@ end
 	PURPOSE: Disables a combo box and sets the text color to gray
 -------------------------------------------------------------------]]
 function COE_Config:DisableComboBox( element )
-	getglobal( element:GetName() .. "CB" ):Hide();
+	local cb = getglobal( element:GetName() .. "CB" )
+	cb:Disable()
+	cb:SetAlpha( 0.6 )
+	cb.EnableMouse = false
+
+	local btn = getglobal( cb:GetName() .. "Button" )
+	if btn and btn.Disable then btn:Disable() end
+
 	getglobal( element:GetName() .. "LeftText" ):SetTextColor( GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b );
+end
+
+function COE_Config:EnableEditBox( element )
+	element:SetAlpha( 1.0 )
+	element:EnableMouse( true )
+end
+
+function COE_Config:DisableEditBox( element )
+	element:SetAlpha( 0.6 )
+	element:EnableMouse( false )
+	element:ClearFocus()
 end
 
 --[[ ----------------------------------------------------------------
@@ -668,11 +724,14 @@ function COEOptionEnableTotemBar()
 
 	if (COE_Config:GetSaved( COEOPT_ENABLETOTEMBAR ) == 1) then
 		COE_ConfigTotemTotemBar:Enable();
-		COE_ConfigTotemTotemOptions:Enable();
 		COE_ConfigTotemTotemSets:Enable();
+		COE_ConfigTotemTotemOptions:Enable();
+		COE_ConfigTotemNotifications:Enable();
 
 		COE_Config:EnableCheckBox( COE_OptionFixBar );
 		COE_Config:EnableCheckBox( COE_OptionGroupBars );
+		COE_Config:EnableCheckBox( COE_OptionEnableRecallButton );
+		COE_Config:EnableCheckBox( COE_OptionCtrlClick );
 		COE_Config:EnableComboBox( COE_OptionTTAlignment );
 		COE_Config:EnableComboBox( COE_OptionDisplayMode );
 		COE_OptionConfigureBar:Enable();
@@ -683,13 +742,16 @@ function COEOptionEnableTotemBar()
 		COE_OptionFlexCount:Show();
 	else
 		COE_ConfigTotemTotemBar:Disable();
-		COE_ConfigTotemTotemOptions:Disable();
 		COE_ConfigTotemTotemSets:Disable();
+		COE_ConfigTotemTotemOptions:Disable();
+		COE_ConfigTotemNotifications:Disable();
 
 		COE_Config:OnSubTabButtonClick( COE_ConfigTotemTotemBar );
 
 		COE_Config:DisableCheckBox( COE_OptionFixBar );
 		COE_Config:DisableCheckBox( COE_OptionGroupBars );
+		COE_Config:DisableCheckBox( COE_OptionEnableRecallButton );
+		COE_Config:DisableCheckBox( COE_OptionCtrlClick );
 		COE_Config:DisableComboBox( COE_OptionTTAlignment );
 		COE_Config:DisableComboBox( COE_OptionDisplayMode );
 		COE_Config:ConfigureSet( false );
@@ -748,13 +810,19 @@ end
 --[[ ----------------------------------------------------------------
 	METHOD: COEOptionShieldChange
 
-	PURPOSE: Enable/disable shield sound option
+	PURPOSE: Enable/disable shield options
 	-------------------------------------------------------------------]]
 function COEOptionShieldChange()
-	if (COE_Config:GetSaved( COEOPT_ENABLESHIELDNOTIFICATIONS ) == 1) then
-		getglobal( "COE_OptionEnableShieldNotificationsSound" ):Enable()
+	if (COE_Config:GetSaved( COEOPT_SHIELDNOTIFICATION ) == 1) then
+		COE_Config:EnableCheckBox( getglobal( "COE_OptionShieldIcon" ) );
+		COE_Config:EnableComboBox( getglobal( "COE_OptionShieldSound" ) )
+		COE_Config:EnableEditBox( getglobal( "COE_OptionShieldCharges" ) );
+		getglobal( "COE_OptionShieldChargesStringText" ):SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b );
 	else
-		getglobal( "COE_OptionEnableShieldNotificationsSound" ):Disable()
+		COE_Config:DisableCheckBox( getglobal( "COE_OptionShieldIcon" ) );
+		COE_Config:DisableComboBox( getglobal( "COE_OptionShieldSound" ) )
+		COE_Config:DisableEditBox( getglobal( "COE_OptionShieldCharges" ) );
+		getglobal( "COE_OptionShieldChargesStringText" ):SetTextColor( GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b );
 	end
 end
 
@@ -766,13 +834,15 @@ end
 	-------------------------------------------------------------------]]
 
 function COEOptionWeaponChange()
-	if (COE_Config:GetSaved( COEOPT_ENABLEWEAPONNOTIFICATIONS ) == 1) then
-		getglobal( "COE_OptionEnableWeaponNotificationsSound" ):Enable()
+	if (COE_Config:GetSaved( COEOPT_WEAPONNOTIFICATION ) == 1) then
+		getglobal( "COE_OptionWeaponIcon" ):Enable()
+		COE_Config:EnableComboBox( getglobal( "COE_OptionWeaponSound" ) )
 		if (not Chronos.isScheduledByName( "COEWeaponCheck" )) then
 			Chronos.scheduleByName( "COEWeaponCheck", COE.WeaponCheckInterval, COESched_RunWeaponCheck )
 		end
 	else
-		getglobal( "COE_OptionEnableWeaponNotificationsSound" ):Disable()
+		getglobal( "COE_OptionWeaponIcon" ):Disable()
+		COE_Config:DisableComboBox( getglobal( "COE_OptionWeaponSound" ) )
 		Chronos.unscheduleByName( "COEWeaponCheck" )
 	end
 end
@@ -786,7 +856,6 @@ function COEOptionEnableRecallButton()
 	COE_Totem:UpdateTotemicRecall( COE[ "ForceUpdate" ] )
 end
 
-
 --[[ ----------------------------------------------------------------
 	METHOD: COEOptionScaleCheckButton
 
@@ -798,7 +867,7 @@ function COEOptionScaleCheckButton( button )
 	local font, height, flags = text:GetFont()
 
 	button:SetScale( 0.6 )
-	text:SetFont(font, height * 1.4, flags)
+	text:SetFont( font, height * 1.4, flags )
 end
 
 --[[ ----------------------------------------------------------------
@@ -849,6 +918,40 @@ function COEOptionDisplayModeClick()
 	COETotemFrame.Reconfigure = true;
 end
 
+---@param cb Frame
+---@param setting number
+function COEOptionSoundsInit( cb, setting )
+	local info = {
+		arg1 = cb,
+		arg2 = setting,
+		func = CEOOptionSoundsClick
+	}
+
+	for _, sound in pairs( COE.Sounds ) do
+		info.text = sound.Name
+		UIDropDownMenu_AddButton( info );
+	end
+
+	UIDropDownMenu_SetSelectedID( cb, COE_Config:GetSaved( setting ) );
+end
+
+function CEOOptionSoundsClick( cb, setting )
+	UIDropDownMenu_SetSelectedID( cb, this:GetID() );
+	COE_Config:SetOption( setting, this:GetID() );
+end
+
+function COEOptionAdvisorSoundInit()
+	COEOptionSoundsInit( getglobal( "COE_OptionAdvisorSoundCB" ), COEOPT_ADVISORSOUND )
+end
+
+function COEOptionWeaponSoundInit()
+	COEOptionSoundsInit( getglobal( "COE_OptionWeaponSoundCB" ), COEOPT_WEAPONNOTIFICATIONSOUND )
+end
+
+function COEOptionShieldSoundInit()
+	COEOptionSoundsInit( getglobal( "COE_OptionShieldSoundCB" ), COEOPT_SHIELDNOTIFICATIONSOUND )
+end
+
 --[[ ----------------------------------------------------------------
 	METHOD: COEOptionEnableSets()
 
@@ -878,7 +981,8 @@ end
 -------------------------------------------------------------------]]
 function COEOptionEnableAdvisor()
 	if (COE_Config:GetSaved( COEOPT_ADVISOR ) == 1) then
-		getglobal( "COE_OptionAdvisorSound" ):Enable()
+		getglobal( "COE_OptionAdvisorIcon" ):Enable()
+		COE_Config:EnableComboBox( getglobal( "COE_OptionAdvisorSound" ) )
 		-- schedule only if not already scheduled to prevent
 		-- rescheduling on config dialog display
 		-- --------------------------------------------------
@@ -886,7 +990,8 @@ function COEOptionEnableAdvisor()
 			Chronos.scheduleByName( "COEAdvise", COE.AdvisorInterval, COESched_RunAdvisor );
 		end
 	else
-		getglobal( "COE_OptionAdvisorSound" ):Disable()
+		getglobal( "COE_OptionAdvisorIcon" ):Disable()
+		COE_Config:DisableComboBox( getglobal( "COE_OptionAdvisorSound" ) )
 		Chronos.unscheduleByName( "COEAdvise" );
 		COE.CleansingTotems.Tremor.Warn = false;
 		COE.CleansingTotems.Disease.Warn = false;
@@ -1119,6 +1224,100 @@ end
 -------------------------------------------------------------------]]
 function COEOptionScalingChange()
 	COE_Config:SetOption( COEOPT_SCALING, COE_OptionScaling:GetValue() );
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionNotifyIconDurationShow()
+
+	PURPOSE: Sets the slider texts and values
+-------------------------------------------------------------------]]
+function COEOptionNotifyIconDurationShow()
+	---@type Slider
+	local slider = getglobal( "COE_OptionNotifyIconDuration" )
+
+	slider:SetMinMaxValues( 1, 10 );
+	slider:SetValue( COE_Config:GetSaved( COEOPT_NOTIFYICONDURATION ) );
+	slider:SetValueStep( 1 );
+
+	getglobal( slider:GetName() .. "Low" ):SetText( 1 );
+	getglobal( slider:GetName() .. "High" ):SetText( 10 );
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionNotifyIconDurationChange()
+
+	PURPOSE: Stores the option and updates the display
+-------------------------------------------------------------------]]
+function COEOptionNotifyIconDurationChange()
+	---@type Slider
+	local slider = getglobal( "COE_OptionNotifyIconDuration" )
+	COE_Config:SetOption( COEOPT_NOTIFYICONDURATION, slider:GetValue() );
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionNotifyIconSizeShow()
+
+	PURPOSE: Sets the slider texts and values
+-------------------------------------------------------------------]]
+function COEOptionNotifyIconSizeShow()
+	---@type Slider
+	local slider = getglobal( "COE_OptionNotifyIconSize" )
+
+	slider:SetMinMaxValues( 32, 256 );
+	slider:SetValue( COE_Config:GetSaved( COEOPT_NOTIFYICONSIZE ) );
+	slider:SetValueStep( 8 );
+
+	getglobal( slider:GetName() .. "Low" ):SetText( 32 );
+	getglobal( slider:GetName() .. "High" ):SetText( 256 );
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionNotifyIconSizeChange()
+
+	PURPOSE: Stores the option and updates the display
+-------------------------------------------------------------------]]
+function COEOptionNotifyIconSizeChange()
+	---@type Slider
+	local slider = getglobal( "COE_OptionNotifyIconSize" )
+
+	if COE_Config:GetSaved( COEOPT_NOTIFYICONSIZE ) ~= slider:GetValue() then
+		COE:ShowNotificationIcon( COE[ "Shields" ][ "Water" ], true );
+	end
+
+	COE_Config:SetOption( COEOPT_NOTIFYICONSIZE, slider:GetValue() );
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionNotifyIconAlphaShow()
+
+	PURPOSE: Sets the slider texts and values
+-------------------------------------------------------------------]]
+function COEOptionNotifyIconAlphaShow()
+	---@type Slider
+	local slider = getglobal( "COE_OptionNotifyIconAlpha" )
+
+	slider:SetMinMaxValues( 0.1, 1 );
+	slider:SetValue( COE_Config:GetSaved( COEOPT_NOTIFYICONALPHA ) );
+	slider:SetValueStep( 0.1 );
+
+	getglobal( slider:GetName() .. "Low" ):SetText( 0.1 );
+	getglobal( slider:GetName() .. "High" ):SetText( 1 );
+end
+
+--[[ ----------------------------------------------------------------
+	METHOD: COEOptionNotifyIconAlphaChange()
+
+	PURPOSE: Stores the option and updates the display
+-------------------------------------------------------------------]]
+function COEOptionNotifyIconAlphaChange()
+	---@type Slider
+	local slider = getglobal( "COE_OptionNotifyIconAlpha" )
+
+	if COE_Config:GetSaved( COEOPT_NOTIFYICONALPHA ) ~= slider:GetValue() then
+		COE:ShowNotificationIcon( COE[ "Shields" ][ "Water" ], true );
+	end
+
+	COE_Config:SetOption( COEOPT_NOTIFYICONALPHA, slider:GetValue() );
 end
 
 --[[ ----------------------------------------------------------------
@@ -1425,7 +1624,7 @@ end
 function COE_Config:RegisterOption( id, type, func, value, initfunc, skip )
 	-- check if the type is valid
 	-- ---------------------------
-	if (type ~= 'check' and type ~= 'combo' and type ~= 'slider') then
+	if (type ~= 'check' and type ~= 'combo' and type ~= 'slider' and type ~= 'editbox') then
 		return;
 	end
 
@@ -1463,5 +1662,92 @@ function COE_Config:GetSaved( id )
 		return COE_Config.Defaults[ id ];
 	else
 		return nil;
+	end
+end
+
+function COE_Config:pfUISkin()
+	pfUI.api.StripTextures( COE_ConfigFrame, nil, "BACKGROUND" )
+	pfUI.api.CreateBackdrop( COE_ConfigFrame, nil, true )
+
+	for _, e in { "COE_ConfigTotemTotemBarPanel", "COE_ConfigTotemTotemSetsPanel", "COE_ConfigTotemTotemOptionsPanel", "COE_ConfigTotemNotificationsPanel" } do
+		local frame = getglobal( e )
+		pfUI.api.StripTextures( frame, nil, "BACKGROUND" )
+		pfUI.api.CreateBackdrop( frame, nil, true )
+		frame:SetPoint( "TopLeft", 10, -115 )
+		frame:SetPoint( "BottomRight", -10, 10 )
+	end
+
+	local panel = getglobal( "COE_ConfigTotemTabPanel" )
+	pfUI.api.StripTextures( panel, nil, "BACKGROUND" )
+	pfUI.api.CreateBackdrop( panel, nil, true )
+
+	getglobal( "COE_ConfigTotemTotemBar" ):SetPoint( "TopLeft", getglobal( "COE_ConfigTotemTabPanelTitleBox" ), "TopLeft", 5, -75 )
+	getglobal( "COE_ConfigTotemTotemBar" ):SetWidth( 90 )
+	getglobal( "COE_OptionConfigureSet" ):SetPoint( "TopLeft", getglobal( "COE_OptionActiveSet" ), "BottomLeft", 7, -20 )
+
+	for _, e in { "COE_ConfigTotemTotemBar", "COE_ConfigTotemTotemSets", "COE_ConfigTotemTotemOptions", "COE_ConfigTotemNotifications", "COE_OptionConfigureBar", "COE_OptionConfigureOrder", "COE_ConfigClose",
+		"COE_OptionConfigureSet", "COE_OptionDeleteSet", "COE_OptionNewSet",
+		"COE_OptionScanTotems",
+	} do
+		pfUI.api.SkinButton( getglobal( e ) )
+	end
+
+	for _, e in { "COE_OptionFixBar", "COE_OptionGroupBars", "COE_OptionEnableRecallButton", "COE_OptionCtrlClick",
+		"COE_OptionEnableSets", "COE_OptionEnableForceSets", "COE_OptionEnableDistanceCheck", "COE_OptionEnableAutoSwitch",
+		"COE_OptionEnableTimers", "COE_OptionEnableTimerFrame", "COE_OptionFrameTimersOnly",
+		"COE_OptionEnableTimerNotifications", "COE_OptionEnableRecallReminder", "COE_OptionAdvisor", "COE_OptionAdvisorIcon", "COE_OptionWeapon", "COE_OptionWeaponIcon", "COE_OptionShield", "COE_OptionShieldIcon"
+	} do
+		pfUI.api.SkinCheckbox( getglobal( e ), 25 )
+	end
+
+	for _, e in { "COE_OptionAdvisor", "COE_OptionWeapon", "COE_OptionShield" } do
+		getglobal( e .. "Icon" ):SetPoint( "TopLeft", getglobal( e ), "BottomLeft", 42, 13 )
+	end
+
+
+
+	getglobal( "COE_OptionTTAlignment" ):SetPoint( "TopLeft", getglobal( "COE_OptionGroupBars" ), "BottomLeft", -3, -10 )
+	getglobal( "COE_OptionActiveSet" ):SetPoint( "TopLeft", getglobal( "COE_OptionEnableAutoSwitch" ), "BottomLeft", -3, -10 )
+	getglobal( "COE_OptionDisplayAlignment" ):SetPoint( "TopLeft", getglobal( "COE_OptionFrameTimersOnly" ), "BottomLeft", -3, -10 )
+
+	getglobal( "COE_OptionAdvisorSound" ):SetPoint( "TopLeft", 240, -62 )
+	getglobal( "COE_OptionWeaponSound" ):SetPoint( "TopLeft", getglobal( "COE_OptionAdvisorSound" ), "BottomLeft", 0, -14 )
+	getglobal( "COE_OptionShieldSound" ):SetPoint( "TopLeft", getglobal( "COE_OptionWeaponSound" ), "BottomLeft", 0, -14 )
+
+	for _, e in { "COE_OptionTTAlignment", "COE_OptionDisplayMode", "COE_OptionCurrentFrame", "COE_OptionDirection", "COE_OptionFrameMode",
+		"COE_OptionActiveSet",
+		"COE_OptionDisplayAlignment", "COE_OptionOverrideRank",
+		"COE_OptionAdvisorSound", "COE_OptionWeaponSound", "COE_OptionShieldSound"
+	} do
+		local cb = getglobal( e .. "CB" )
+		local text = getglobal( e .. "Left" )
+
+		pfUI.api.SkinDropDown( cb )
+		UIDropDownMenu_SetWidth( 110, cb )
+		text:SetPoint( "Left", cb, "Right", 20 )
+	end
+
+	local setname = getglobal( "COE_OptionSetName" )
+	pfUI.api.StripTextures( setname, "BACKGROUND" )
+	pfUI.api.CreateBackdrop( setname, 5, false )
+	setname:SetHeight( 15 )
+	setname:SetWidth( 140 )
+	setname:SetPoint( "TopLeft", getglobal( "COE_OptionNewSet" ), "TopRight", 15, -8 )
+
+	for _, e in { "COE_OptionCastOrder1", "COE_OptionCastOrder2", "COE_OptionCastOrder3", "COE_OptionCastOrder4" } do
+		pfUI.api.SkinArrowButton( getglobal( e .. "MoveDown" ), "down" )
+		pfUI.api.SkinArrowButton( getglobal( e .. "MoveUp" ), "up" )
+	end
+
+	getglobal( "COE_OptionShieldChargesString" ):SetPoint( "TopLeft", getglobal( "COE_OptionShield" ), "BottomLeft", 25, -10 )
+
+	local charges = getglobal( "COE_OptionShieldCharges" )
+	pfUI.api.StripTextures( charges, "BACKGROUND" )
+	pfUI.api.CreateBackdrop( charges, 5, false )
+	charges:SetHeight( 15 )
+	charges:SetPoint( "TopLeft", 219, -5 )
+
+	for _, e in { "COE_OptionFlexCount", "COE_OptionScaling", "COE_OptionNotifyIconDuration", "COE_OptionNotifyIconSize", "COE_OptionNotifyIconAlpha" } do
+		pfUI.api.SkinSlider( getglobal( e ) )
 	end
 end
