@@ -435,19 +435,19 @@ function COE_Totem:ThrowAdvisedTotem()
 					COE.CleansingTotems.Tremor.Totem.OutOfRange or
 					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Earth" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Tremor.Totem.SpellName );
-		COE:HideNotificationIcon( COE.CleansingTotems.Tremor.Totem.Texture )
+		COE.notify_icon.hide( COE.CleansingTotems.Tremor.Totem.Texture )
 	elseif (COE.CleansingTotems.Disease.Warn and
 				(COE.ActiveTotems.Water ~= COE.CleansingTotems.Disease.Totem or
 					COE.CleansingTotems.Disease.Totem.OutOfRange or
 					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Disease.Totem.SpellName );
-		COE:HideNotificationIcon( COE.CleansingTotems.Disease.Totem.Texture )
+		COE.notify_icon.hide( COE.CleansingTotems.Disease.Totem.Texture )
 	elseif (COE.CleansingTotems.Poison.Warn and
 				(COE.ActiveTotems.Water ~= COE.CleansingTotems.Poison.Totem or
 					COE.CleansingTotems.Poison.Totem.OutOfRange or
 					not COE_Totem:IsTimerActive( COE.ActiveTotems[ "Water" ] ))) then
 		CastSpellByName( COE.CleansingTotems.Poison.Totem.SpellName );
-		COE:HideNotificationIcon( COE.CleansingTotems.Poison.Totem.Texture )
+		COE.notify_icon.hide( COE.CleansingTotems.Poison.Totem.Texture )
 	end
 end
 

@@ -53,6 +53,8 @@
 ---@type COE_Config
 COE_Config = COE_Config or {}
 
+---@type COE
+local COE = COE
 
 --[[ ----------------------------------------------------------------
 	COE_Config.CurrentPanel and COE_Config.CurrentSubPanel contain
@@ -408,7 +410,7 @@ function COE_Config:CloseDialog()
 	COE_Config:ConfigureBar( false );
 	COE_Config:ConfigureOrder( false );
 	COE_Config:ConfigureSet( false );
-	COE:HideNotificationIcon();
+	COE.notify_icon.hide();
 	COE_ConfigFrame:Hide();
 end
 
@@ -835,13 +837,13 @@ end
 
 function COEOptionWeaponChange()
 	if (COE_Config:GetSaved( COEOPT_WEAPONNOTIFICATION ) == 1) then
-		getglobal( "COE_OptionWeaponIcon" ):Enable()
+		COE_Config:EnableCheckBox( getglobal( "COE_OptionWeaponIcon" ) );
 		COE_Config:EnableComboBox( getglobal( "COE_OptionWeaponSound" ) )
 		if (not Chronos.isScheduledByName( "COEWeaponCheck" )) then
 			Chronos.scheduleByName( "COEWeaponCheck", COE.WeaponCheckInterval, COESched_RunWeaponCheck )
 		end
 	else
-		getglobal( "COE_OptionWeaponIcon" ):Disable()
+		COE_Config:DisableCheckBox( getglobal( "COE_OptionWeaponIcon" ) );
 		COE_Config:DisableComboBox( getglobal( "COE_OptionWeaponSound" ) )
 		Chronos.unscheduleByName( "COEWeaponCheck" )
 	end
@@ -981,7 +983,7 @@ end
 -------------------------------------------------------------------]]
 function COEOptionEnableAdvisor()
 	if (COE_Config:GetSaved( COEOPT_ADVISOR ) == 1) then
-		getglobal( "COE_OptionAdvisorIcon" ):Enable()
+		COE_Config:EnableCheckBox( getglobal( "COE_OptionAdvisorIcon" ) )
 		COE_Config:EnableComboBox( getglobal( "COE_OptionAdvisorSound" ) )
 		-- schedule only if not already scheduled to prevent
 		-- rescheduling on config dialog display
@@ -990,7 +992,7 @@ function COEOptionEnableAdvisor()
 			Chronos.scheduleByName( "COEAdvise", COE.AdvisorInterval, COESched_RunAdvisor );
 		end
 	else
-		getglobal( "COE_OptionAdvisorIcon" ):Disable()
+		COE_Config:DisableCheckBox( getglobal( "COE_OptionAdvisorIcon" ) )
 		COE_Config:DisableComboBox( getglobal( "COE_OptionAdvisorSound" ) )
 		Chronos.unscheduleByName( "COEAdvise" );
 		COE.CleansingTotems.Tremor.Warn = false;
@@ -1281,10 +1283,9 @@ function COEOptionNotifyIconSizeChange()
 	local slider = getglobal( "COE_OptionNotifyIconSize" )
 
 	if COE_Config:GetSaved( COEOPT_NOTIFYICONSIZE ) ~= slider:GetValue() then
-		COE:ShowNotificationIcon( COE[ "Shields" ][ "Water" ], true );
+		COE_Config:SetOption( COEOPT_NOTIFYICONSIZE, slider:GetValue() );
+		COE.notify_icon.show( COE[ "Shields" ][ "Water" ], true )
 	end
-
-	COE_Config:SetOption( COEOPT_NOTIFYICONSIZE, slider:GetValue() );
 end
 
 --[[ ----------------------------------------------------------------
@@ -1314,10 +1315,9 @@ function COEOptionNotifyIconAlphaChange()
 	local slider = getglobal( "COE_OptionNotifyIconAlpha" )
 
 	if COE_Config:GetSaved( COEOPT_NOTIFYICONALPHA ) ~= slider:GetValue() then
-		COE:ShowNotificationIcon( COE[ "Shields" ][ "Water" ], true );
+		COE_Config:SetOption( COEOPT_NOTIFYICONALPHA, slider:GetValue() );
+		COE.notify_icon.show( COE[ "Shields" ][ "Water" ], true )
 	end
-
-	COE_Config:SetOption( COEOPT_NOTIFYICONALPHA, slider:GetValue() );
 end
 
 --[[ ----------------------------------------------------------------
@@ -1685,9 +1685,10 @@ function COE_Config:pfUISkin()
 	getglobal( "COE_ConfigTotemTotemBar" ):SetWidth( 90 )
 	getglobal( "COE_OptionConfigureSet" ):SetPoint( "TopLeft", getglobal( "COE_OptionActiveSet" ), "BottomLeft", 7, -20 )
 
+	-- Skin buttons
 	for _, e in { "COE_ConfigTotemTotemBar", "COE_ConfigTotemTotemSets", "COE_ConfigTotemTotemOptions", "COE_ConfigTotemNotifications", "COE_OptionConfigureBar", "COE_OptionConfigureOrder", "COE_ConfigClose",
 		"COE_OptionConfigureSet", "COE_OptionDeleteSet", "COE_OptionNewSet",
-		"COE_OptionScanTotems",
+		"COE_OptionScanTotems", "COE_OptionNotifyIconShow"
 	} do
 		pfUI.api.SkinButton( getglobal( e ) )
 	end
@@ -1714,6 +1715,7 @@ function COE_Config:pfUISkin()
 	getglobal( "COE_OptionWeaponSound" ):SetPoint( "TopLeft", getglobal( "COE_OptionAdvisorSound" ), "BottomLeft", 0, -14 )
 	getglobal( "COE_OptionShieldSound" ):SetPoint( "TopLeft", getglobal( "COE_OptionWeaponSound" ), "BottomLeft", 0, -14 )
 
+	-- Skin dropdowns
 	for _, e in { "COE_OptionTTAlignment", "COE_OptionDisplayMode", "COE_OptionCurrentFrame", "COE_OptionDirection", "COE_OptionFrameMode",
 		"COE_OptionActiveSet",
 		"COE_OptionDisplayAlignment", "COE_OptionOverrideRank",
@@ -1734,6 +1736,7 @@ function COE_Config:pfUISkin()
 	setname:SetWidth( 140 )
 	setname:SetPoint( "TopLeft", getglobal( "COE_OptionNewSet" ), "TopRight", 15, -8 )
 
+	-- Skin arrow buttons
 	for _, e in { "COE_OptionCastOrder1", "COE_OptionCastOrder2", "COE_OptionCastOrder3", "COE_OptionCastOrder4" } do
 		pfUI.api.SkinArrowButton( getglobal( e .. "MoveDown" ), "down" )
 		pfUI.api.SkinArrowButton( getglobal( e .. "MoveUp" ), "up" )
@@ -1747,6 +1750,7 @@ function COE_Config:pfUISkin()
 	charges:SetHeight( 15 )
 	charges:SetPoint( "TopLeft", 219, -5 )
 
+	-- Skin sliders
 	for _, e in { "COE_OptionFlexCount", "COE_OptionScaling", "COE_OptionNotifyIconDuration", "COE_OptionNotifyIconSize", "COE_OptionNotifyIconAlpha" } do
 		pfUI.api.SkinSlider( getglobal( e ) )
 	end

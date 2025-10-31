@@ -226,7 +226,7 @@ function COE_Totem:OnMainFrameEvent( event )
 
 			if currentShieldCharges and (not COE.shieldWarning or COE.shieldWarning and COE.shieldWarning ~= currentShieldCharges) and currentShieldCharges > warnCharges then
 				COE.shieldWarning = currentShieldCharges
-				COE:HideNotificationIcon( COE.Shields[ COE.activeShield ] )
+				COE.notify_icon.hide( COE.Shields[ COE.activeShield ] )
 			end
 
 			if COE.activeShield then

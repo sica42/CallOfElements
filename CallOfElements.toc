@@ -2,7 +2,7 @@
 ## Title: Call Of Elements
 ## Notes: The All-In-One Shaman Addon
 ## Notes-ruRU: Аддон "Все в одном" для Шаманов
-## Version: 3.4
+## Version: 3.4.1
 ## SavedVariables: COE_Saved, COEFramePositions
 ## SavedVariablesPerCharacter: COE_SavedTotemSets, COE_CustomTotemSets, COE_DisplayedTotems, COE_TotemBars
 libs\Chronos.xml
@@ -11,3 +11,4 @@ COE_ConfigTemplates.xml
 COE_Config.xml
 COE_Totem.xml
 COE_Heal.xml
+COE_NotifyIcon.lua

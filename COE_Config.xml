@@ -716,6 +716,20 @@
 									</Anchor>
 								</Anchors>
 							</Slider>
+							<Button name="COE_OptionNotifyIconShow" inherits="COE_ConfigSetButtonTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="COE_OptionNotifyIconAlpha" relativePoint="TOPRIGHT">
+										<Offset>
+											<AbsDimension x="20" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										COE.notify_icon:config_show()
+									</OnClick>
+								</Scripts>
+							</Button>
 						</Frames>
 					</Frame>
 				</Frames>

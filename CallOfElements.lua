@@ -59,9 +59,6 @@
 ---@field Message fun( self: COE, msg: string )
 ---@field DebugMessage fun( self: COE, msg: string )
 ---@field Notification fun( self: COE, msg: string, color: number, alarm: integer?, icon: string? )
----@field ShowNotificationIcon fun( self: COE, texture: string, configMode: boolean? )
----@field HideNotificationIcon fun( self: COE, texture: string? )
----@field UpdateNotificationIcon fun( self: COE, elapsed: number )
 ---@field ToggleConfigFrame fun( self: COE )
 ---@field DisplayShellCommands fun( self: COE )
 ---@field FixSavedVariables fun( self: COE )
@@ -160,8 +157,11 @@ function COE:OnEvent( event )
 			end
 		end
 	elseif event == "PLAYER_LOGIN" then
+		---@type NotifyIcon
+		COE.notify_icon = COE.NotifyIcon.new()
+
 		if COE.Initialized then
-			COE:Message( "Call of Elements v" .. COE_VERSION .. " /coe" );
+			COE:Message( "Call of Elements v" .. COE_VERSION .. " loaded: /coe" );
 		else
 			COE:Message( COESTR_NOTASHAMAN );
 		end
@@ -235,104 +235,9 @@ function COE:Notification( msg, color, alarm, icon )
 	-- show icon
 	-- ----------
 	if icon then
-		COE:ShowNotificationIcon( icon );
+		COE.notify_icon.show( icon );
 	end
 end;
-
---[[ ----------------------------------------------------------------
-	METHOD: ShowNotificationIcon
-
-	PURPOSE: Shows the notification icon
--------------------------------------------------------------------]]
-function COE:ShowNotificationIcon( texture, configMode )
-	---@type NotificationIcon
-	local frame = getglobal( "COENotificationIconFrame" )
-
-	---@type Texture
-	local icon = getglobal( "COENotificationIconFrameIcon" )
-
-	if frame and icon then
-		if (frame.state == "HOLD" or frame.state == "SHOW") and icon:GetTexture() == texture and not configMode then
-			return
-		end
-		local size = COE_Config:GetSaved( COEOPT_NOTIFYICONSIZE )
-		icon:SetTexture( texture )
-		frame:SetWidth( size )
-		frame:SetHeight( size )
-		frame:SetPoint( "Center", UIParent, "Center", 0, 280 - (size/2) )
-		frame.elapsedTime = 0
-
-		if configMode then
-			frame:SetAlpha( COE_Config:GetSaved( COEOPT_NOTIFYICONALPHA ) )
-			frame:SetScale( 1 )
-			frame.state = "CONFIG"
-		else
-			frame.state = "SHOW"
-		end
-
-		frame:Show()
-	end
-end
-
---[[ ----------------------------------------------------------------
-	METHOD: HideNotificationIcon
-
-	PURPOSE: Hides the notification icon
--------------------------------------------------------------------]]
-function COE:HideNotificationIcon( texture)
-	---@type NotificationIcon
-	local frame = getglobal( "COENotificationIconFrame" )
-	---@type Texture
-	local icon = getglobal( "COENotificationIconFrameIcon" )
-
-	if frame and frame.state ~= "DONE" then
-		if not texture or texture == icon:GetTexture() then
-			frame.elapsedTime = 0
-			frame.state = "HIDE"
-		end
-	end
-end
-
---[[ ----------------------------------------------------------------
-	METHOD: UpdateNotificationIcon
-
-	PURPOSE: Update event for the notification icon
--------------------------------------------------------------------]]
-function COE:UpdateNotificationIcon( elapsed )
-	---@type NotificationIcon
-	local frame = getglobal( "COENotificationIconFrame" )
-	local iconAlpha = COE_Config:GetSaved( COEOPT_NOTIFYICONALPHA )
-	frame.elapsedTime = frame.elapsedTime + elapsed
-
-	if frame.state == "SHOW" then
-		local scale = frame.elapsedTime / 0.4
-		local alpha = iconAlpha * (frame.elapsedTime / 0.4)
-
-		if scale >= 1 then
-			scale = 1
-			alpha = iconAlpha
-			frame.state = "HOLD"
-		end
-		frame:SetScale( scale )
-		frame:SetAlpha( math.min( alpha, iconAlpha ) )
-	elseif frame.state == "HOLD" then
-		if frame.elapsedTime >= COE_Config:GetSaved( COEOPT_NOTIFYICONDURATION ) then
-			frame.elapsedTime = 0
-			frame.state = "HIDE"
-		end
-	elseif frame.state == "HIDE" then
-		local scale = 1 + (0-1) * (frame.elapsedTime / 0.4)
-		local alpha = iconAlpha + (0 - iconAlpha) * (frame.elapsedTime / 0.4)
-		if alpha <= 0 then
-			alpha = 0
-			scale = 0
-			frame.state = "DONE"
-			frame:Hide()
-		end
-		frame:SetScale( scale )
-		frame:SetAlpha( alpha )
-	end
-end
 
 --[[ ----------------------------------------------------------------
 	METHOD: COE:ToggleConfigFrame
